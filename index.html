@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="智能优惠助手：输入购物需求，获取清晰的模拟选购建议。" />
+    <title>智能优惠助手｜让 AI 帮你挑</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./ai.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="智能优惠助手首页"><span class="brand-mark">¥</span><span>智能优惠助手</span></a>
+      <nav aria-label="主导航"><a class="active" href="#ai-assistant">AI 推荐</a><a href="#rankings">今日榜单</a><a href="#how-it-works">使用说明</a></nav>
+      <button class="refresh-button" id="refreshButton" type="button"><span aria-hidden="true">↻</span> 刷新榜单</button>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">DAILY SMART PICKS · 2026.08.02</p>
+          <h1 id="hero-title">少花一点，<br />买得更聪明。</h1>
+          <p class="hero-description">精选今日高价值优惠，用更少时间，找到更值得入手的商品。</p>
+          <a class="hero-cta" href="#rankings">查看今日必买榜 <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-label">今日预计可省</span>
+          <strong>¥ 12,860</strong>
+          <span class="stat-caption">来自 24 个优选商品</span>
+          <div class="sparkline" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <section class="ai-assistant" id="ai-assistant" aria-labelledby="assistant-title">
+        <div class="assistant-heading"><div><p class="eyebrow">AI SHOPPING GUIDE</p><h2 id="assistant-title">不知道买什么？<br />让 AI 帮你挑。</h2></div><p>输入预算、使用场景或送礼对象，<br />获得一份清晰的模拟选购建议。</p></div>
+        <form class="assistant-form" id="assistantForm">
+          <label class="sr-only" for="recommendationInput">你的购买需求</label>
+          <span class="input-spark" aria-hidden="true">✦</span><input id="recommendationInput" name="query" type="text" maxlength="120" placeholder="例如：500 元以内适合大学生的耳机" />
+          <button id="recommendButton" type="submit"><span class="button-label">获取 AI 推荐</span><span class="button-loader" aria-hidden="true"></span><span aria-hidden="true">→</span></button>
+        </form>
+        <p class="prompt-hint">试试：<button type="button" class="prompt-chip">500元以内适合大学生的耳机</button><button type="button" class="prompt-chip">预算300元送女生礼物</button><button type="button" class="prompt-chip">适合猫咪的玩具</button></p>
+        <div class="recommendation-result" id="recommendationResult" aria-live="polite" hidden></div>
+      </section>
+
+      <section class="rankings" id="rankings" aria-labelledby="rankings-title">
+        <div class="section-heading"><div><p class="eyebrow">TODAY'S SELECTION</p><h2 id="rankings-title">今日值得买什么？</h2></div><p id="updatedAt">模拟数据更新于 今天 10:30</p></div>
+        <div class="rank-tabs" role="tablist" aria-label="排行榜类型">
+          <button class="rank-tab active" type="button" role="tab" aria-selected="true" data-ranking="mustBuy"><span>01</span> 今日必买榜</button>
+          <button class="rank-tab" type="button" role="tab" aria-selected="false" data-ranking="saving"><span>02</span> 今日省钱榜</button>
+          <button class="rank-tab" type="button" role="tab" aria-selected="false" data-ranking="priceDrop"><span>03</span> 今日降价榜</button>
+          <button class="rank-tab" type="button" role="tab" aria-selected="false" data-ranking="popular"><span>04</span> 今日热门榜</button>
+        </div>
+        <div class="ranking-intro" id="rankingIntro"></div>
+        <div class="product-grid" id="productGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="trust-strip" id="how-it-works" aria-label="服务说明">
+        <div><span class="strip-icon">◎</span><p><strong>价格透明</strong><br />清晰展示优惠构成</p></div>
+        <div><span class="strip-icon">↗</span><p><strong>多平台比价</strong><br />京东、淘宝一键直达</p></div>
+        <div><span class="strip-icon">◷</span><p><strong>每日更新</strong><br />不错过值得买的时机</p></div>
+      </section>
+    </main>
+    <footer><span>智能优惠助手 · 产品原型</span><span>AI 推荐与商品数据均为模拟内容，不含真实交易或价格数据</span></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "ai-shopping-assistant-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "智能优惠助手静态网页 Demo",
+  "scripts": { "start": "node serve.mjs" }
+}

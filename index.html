@@ -11,28 +11,28 @@
     <main class="page-shell">
       <header class="site-header">
         <a class="brand" href="#top" aria-label="AI 宠物购物助手首页">
-          <span class="brand-icon" aria-hidden="true">✦</span><span>Petwise AI</span>
+          <span class="brand-icon" aria-hidden="true">✦</span><span>Nova AI</span>
         </a>
-        <span class="status"><i></i> 智能推荐已就绪</span>
+        <span class="status"><i></i> AI 推荐已就绪</span>
       </header>
 
       <section class="hero" id="top" aria-labelledby="page-title">
         <div class="orb orb-one" aria-hidden="true"></div><div class="orb orb-two" aria-hidden="true"></div>
-        <p class="eyebrow">YOUR PET'S SMART SHOPPING COMPANION</p>
-        <h1 id="page-title">AI 宠物购物助手</h1>
-        <p class="subtitle">输入宠物品种、年龄和预算，为你推荐适合的商品。</p>
-        <div class="pet-pills" aria-label="适用宠物"><span>🐶 狗狗</span><span>🐱 猫咪</span><span>🐾 用心挑选</span></div>
+        <p class="eyebrow">INTELLIGENT SHOPPING, SIMPLIFIED</p>
+        <h1 id="page-title">AI 智能购物助手</h1>
+        <p class="subtitle">输入预算、需求和偏好，AI 为你快速推荐值得购买的商品。</p>
+        <div class="pet-pills" aria-label="服务特点"><span>个性化推荐</span><span>清晰的购买建议</span><span>模拟 AI 回复</span></div>
       </section>
 
       <section class="chat-card" aria-labelledby="chat-title">
         <div class="chat-heading">
           <div class="ai-avatar" aria-hidden="true">✦</div>
-          <div><p>Petwise AI</p><h2 id="chat-title">今天想为毛孩子挑点什么？</h2></div>
+          <div><p>NOVA AI</p><h2 id="chat-title">告诉我你想买什么</h2></div>
         </div>
-        <div class="welcome-message">告诉我宠物的品种、年龄和预算，我会给你一份贴心的模拟购物建议。</div>
+        <div class="welcome-message">描述预算、使用场景和偏好，我会帮你快速梳理值得优先考虑的商品。</div>
         <form id="assistantForm" class="chat-form">
           <label class="sr-only" for="recommendationInput">宠物购物需求</label>
-          <input id="recommendationInput" name="query" maxlength="160" placeholder="例如：2 岁柯基，预算 300 元，想买主粮和玩具" autocomplete="off" />
+          <input id="recommendationInput" name="query" maxlength="160" placeholder="预算 5000 元，推荐一台轻薄笔记本" autocomplete="off" />
           <button id="recommendButton" type="submit" aria-label="发送消息"><span>发送</span><b aria-hidden="true">↗</b></button>
         </form>
         <div class="quick-prompts" aria-label="快捷推荐">
@@ -42,6 +42,16 @@
           <button type="button" data-prompt="推荐玩具">🧶 推荐玩具</button>
         </div>
         <div id="recommendationResult" class="response" aria-live="polite" hidden></div>
+      </section>
+
+      <section class="products" aria-labelledby="products-title">
+        <div class="section-heading"><div><p class="eyebrow">EDITOR'S PICKS</p><h2 id="products-title">今日值得关注</h2></div><p>精选示例商品 · 模拟数据</p></div>
+        <div class="product-grid">
+          <article class="product-card"><div class="product-image laptop"></div><p class="product-type">轻薄笔记本</p><h3>Air 14 轻薄笔记本</h3><strong>¥ 4,999</strong><button type="button">查看建议</button></article>
+          <article class="product-card"><div class="product-image headphones"></div><p class="product-type">降噪耳机</p><h3>Quiet Pro 无线耳机</h3><strong>¥ 1,299</strong><button type="button">查看建议</button></article>
+          <article class="product-card"><div class="product-image phone"></div><p class="product-type">旗舰手机</p><h3>One Pro 智能手机</h3><strong>¥ 5,699</strong><button type="button">查看建议</button></article>
+          <article class="product-card"><div class="product-image watch"></div><p class="product-type">智能穿戴</p><h3>Fit Watch Series 3</h3><strong>¥ 1,899</strong><button type="button">查看建议</button></article>
+        </div>
       </section>
 
       <p class="disclaimer">本页面展示的是模拟 AI 推荐，不连接任何外部 AI 服务或商品接口。</p>

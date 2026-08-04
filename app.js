@@ -1,5 +1,20 @@
-const form=document.querySelector('#assistantForm'),input=document.querySelector('#recommendationInput'),result=document.querySelector('#recommendationResult'),sendButton=document.querySelector('#recommendButton');
-const catalog={laptop:{image:'laptop',type:'轻薄笔记本',name:'Air 14 轻薄笔记本',price:'¥ 4,999',reason:'在 5000 元级别兼顾轻薄机身、长续航和日常性能，适合作为移动办公主力。',pros:['1.24kg 轻薄便携','16GB 内存，多任务流畅','续航可覆盖全天轻办公'],cons:['不适合大型 3D 渲染','接口数量较少'],people:'学生、通勤办公、文字与轻度创作用户'},headphone:{image:'headphones',type:'降噪耳机',name:'Quiet Pro 无线耳机',price:'¥ 1,299',reason:'降噪和佩戴舒适度表现均衡，适合通勤、差旅和需要专注的工作场景。',pros:['主动降噪稳定','佩戴舒适','多设备切换方便'],cons:['音色偏均衡','不支持有线高解析'],people:'通勤族、远程办公与旅行用户'},phone:{image:'phone',type:'旗舰手机',name:'One Pro 智能手机',price:'¥ 5,699',reason:'影像、屏幕和性能没有明显短板，适合希望长期使用一台主力机的用户。',pros:['旗舰级影像系统','高亮度屏幕','性能冗余充足'],cons:['机身偏重','价格较高'],people:'重视拍照、性能和长期使用体验的用户'},watch:{image:'watch',type:'智能穿戴',name:'Fit Watch Series 3',price:'¥ 1,899',reason:'健康记录与日常提醒体验完整，作为手机配件能明显提升日常便利度。',pros:['健康数据记录完整','续航可靠','轻巧耐用'],cons:['专业运动数据有限','部分功能依赖手机'],people:'关注健康、运动与通知效率的用户'}};
-function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function choose(q){if(/耳机|降噪|音乐/.test(q))return catalog.headphone;if(/手机|拍照|影像/.test(q))return catalog.phone;if(/手表|手环|运动/.test(q))return catalog.watch;return catalog.laptop}function list(a){return `<ul>${a.map(x=>`<li>${x}</li>`).join('')}</ul>`}
-function render(q){const p=choose(q);result.hidden=false;result.innerHTML=`<section class="recommendation-result"><div class="result-intro"><p>AI 推荐结果 · 模拟数据</p><h3>为“${escapeHtml(q)}”找到的优先选择</h3></div><article class="recommendation-card"><div class="result-image ${p.image}"></div><div class="result-main"><span class="result-type">${p.type}</span><h4>${p.name}</h4><strong class="result-price">${p.price}</strong><div class="result-reason"><b>推荐理由</b><p>${p.reason}</p></div><div class="result-details"><div><b>优点</b>${list(p.pros)}</div><div><b>缺点</b>${list(p.cons)}</div></div><p class="audience"><b>适合人群：</b>${p.people}</p><div class="buy-links"><button type="button" data-store="京东">京东购买</button><button type="button" data-store="淘宝">淘宝购买</button></div></div></article><p class="result-note">价格、商品与购买入口均为模拟内容，购买前请以平台实际信息为准。</p></section>`;result.scrollIntoView({behavior:'smooth',block:'start'})}
-form.addEventListener('submit',e=>{e.preventDefault();const q=input.value.trim()||'预算 5000 元，推荐一台轻薄笔记本';sendButton.disabled=true;sendButton.querySelector('span').textContent='分析中';setTimeout(()=>{render(q);sendButton.disabled=false;sendButton.querySelector('span').textContent='发送'},420)});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.prompt;form.requestSubmit()}));result.addEventListener('click',e=>{const b=e.target.closest('[data-store]');if(b)b.textContent=`${b.dataset.store}入口（模拟）`});
+const form = document.querySelector('#assistantForm');
+const input = document.querySelector('#recommendationInput');
+const button = document.querySelector('#recommendButton');
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const query = input.value.trim() || '预算 5000 元，推荐一台轻薄笔记本';
+  button.disabled = true;
+  button.querySelector('span').textContent = '分析中';
+  window.setTimeout(() => {
+    window.location.href = `result.html?q=${encodeURIComponent(query)}`;
+  }, 320);
+});
+
+document.querySelectorAll('[data-prompt]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    input.value = chip.dataset.prompt;
+    form.requestSubmit();
+  });
+});

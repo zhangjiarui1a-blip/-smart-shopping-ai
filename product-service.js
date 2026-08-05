@@ -1,1 +1,147 @@
-window.productService=(()=>{const endpoint=String(window.PRODUCTS_API_URL||'').trim();const categoryRules={手机:['手机','拍照','影像','游戏'],电脑:['电脑','笔记本','轻薄','办公','学习','剪辑'],数码:['耳机','降噪','音箱','平板','相机','投影'],宠物用品:['宠物','猫','狗','猫粮','狗粮','玩具'],家居:['家居','清洁','睡眠','厨房','收纳'],礼物:['礼物','送礼','生日','纪念']};const categoryFor=query=>Object.entries(categoryRules).find(([category,terms])=>query.includes(category)||terms.some(term=>query.includes(term)))?.[0]||'';const normalize=item=>({id:String(item.id||item._id||''),name:String(item.name||''),category:String(item.category||''),brand:String(item.brand||''),price:String(item.price||''),image:String(item.image||'laptop'),description:String(item.description||item.intro||''),specs:item.specs||{},tags:Array.isArray(item.tags)?item.tags:[],pros:Array.isArray(item.pros)?item.pros:[],cons:Array.isArray(item.cons)?item.cons:[],suitableFor:String(item.suitableFor||item.people||''),purchaseUrl:item.purchaseUrl||{},reason:String(item.reason||''),intro:String(item.intro||item.description||''),advice:String(item.advice||''),worth:String(item.worth||''),score:Number(item.score)||80,people:String(item.people||item.suitableFor||'')});const localSearch=query=>{const category=categoryFor(query);const products=window.productDatabase.filter(item=>!category||item.category===category);return products.slice(0,12)};async function getCandidates(query){const category=categoryFor(query);try{if(!endpoint)throw new Error('未配置 window.PRODUCTS_API_URL');console.info('[products] 请求 CloudBase 商品库',{url:endpoint,query,category});const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:category?'':query,category,limit:12})});if(!response.ok)throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0,160)}`);const products=await response.json();if(!Array.isArray(products)||!products.length)throw new Error('商品库未返回匹配商品');console.info('[products] 商品库请求成功',{count:products.length});return{products:products.map(normalize),source:'database',error:null}}catch(error){const message=error instanceof Error?error.message:String(error);console.warn('[products] 商品库不可用，使用本地候选商品',{error:message});const products=localSearch(query);return{products:(products.length?products:window.productDatabase.slice(0,12)).map(normalize),source:'fallback',error:message}}}return{getCandidates,categoryFor,config:{endpoint}})();
+(function () {
+  'use strict';
+
+  var endpoint = String(window.PRODUCTS_API_URL || '').trim();
+  var categoryRules = {
+    '\u624b\u673a': ['\u624b\u673a', '\u62cd\u7167', '\u5f71\u50cf', '\u6e38\u620f'],
+    '\u7535\u8111': ['\u7535\u8111', '\u7b14\u8bb0\u672c', '\u8f7b\u8584', '\u529e\u516c', '\u5b66\u4e60', '\u526a\u8f91'],
+    '\u6570\u7801': ['\u8033\u673a', '\u964d\u566a', '\u97f3\u7bb1', '\u5e73\u677f', '\u76f8\u673a', '\u6295\u5f71'],
+    '\u5ba0\u7269\u7528\u54c1': ['\u5ba0\u7269', '\u732b', '\u72d7', '\u732b\u7cae', '\u72d7\u7cae', '\u73a9\u5177'],
+    '\u5bb6\u5c45': ['\u5bb6\u5c45', '\u6e05\u6d01', '\u7761\u7720', '\u53a8\u623f', '\u6536\u7eb3'],
+    '\u793c\u7269': ['\u793c\u7269', '\u9001\u793c', '\u751f\u65e5', '\u7eaa\u5ff5']
+  };
+
+  function categoryFor(query) {
+    var text = String(query || '');
+    var categories = Object.keys(categoryRules);
+
+    for (var i = 0; i < categories.length; i += 1) {
+      var category = categories[i];
+      var terms = categoryRules[category];
+
+      if (text.indexOf(category) !== -1) {
+        return category;
+      }
+
+      for (var j = 0; j < terms.length; j += 1) {
+        if (text.indexOf(terms[j]) !== -1) {
+          return category;
+        }
+      }
+    }
+
+    return '';
+  }
+
+  function normalizeProduct(product) {
+    product = product || {};
+
+    return {
+      id: product.id || product._id || '',
+      name: product.name || '',
+      category: product.category || '',
+      brand: product.brand || '',
+      price: product.price || '',
+      image: product.image || '',
+      description: product.description || '',
+      specs: product.specs || {},
+      tags: Array.isArray(product.tags) ? product.tags : [],
+      pros: Array.isArray(product.pros) ? product.pros : [],
+      cons: Array.isArray(product.cons) ? product.cons : [],
+      suitableFor: product.suitableFor || product.people || '',
+      purchaseUrl: product.purchaseUrl || {},
+      type: product.type || product.category || '',
+      reason: product.reason || product.description || '',
+      intro: product.intro || product.description || '',
+      advice: product.advice || '',
+      worth: product.worth || '',
+      score: Number(product.score) || 80,
+      people: product.people || product.suitableFor || ''
+    };
+  }
+
+  function getLocalProducts(query) {
+    var source = Array.isArray(window.productDatabase) ? window.productDatabase : [];
+    var category = categoryFor(query);
+    var matched = source;
+
+    if (category) {
+      matched = source.filter(function (product) {
+        return product && product.category === category;
+      });
+    }
+
+    if (!matched.length) {
+      matched = source;
+    }
+
+    return matched.slice(0, 12).map(normalizeProduct);
+  }
+
+  async function getCandidates(query) {
+    var cleanQuery = String(query || '').trim();
+    var category = categoryFor(cleanQuery);
+
+    try {
+      if (!endpoint) {
+        throw new Error('window.PRODUCTS_API_URL is not configured');
+      }
+
+      console.info('[products] requesting CloudBase catalog', {
+        url: endpoint,
+        query: cleanQuery,
+        category: category
+      });
+
+      var response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          keyword: category ? '' : cleanQuery,
+          category: category,
+          limit: 12
+        })
+      });
+
+      var payload = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(payload.error || ('products request failed: ' + response.status));
+      }
+
+      var products = Array.isArray(payload)
+        ? payload
+        : (Array.isArray(payload.products) ? payload.products : []);
+      if (!products.length) {
+        throw new Error('products collection returned no candidates');
+      }
+
+      console.info('[products] CloudBase catalog request succeeded', {
+        count: products.length
+      });
+
+      return {
+        products: products.map(normalizeProduct),
+        source: 'database',
+        error: null
+      };
+    } catch (error) {
+      var message = error && error.message ? error.message : String(error);
+      console.warn('[products] using local fallback', { reason: message });
+
+      return {
+        products: getLocalProducts(cleanQuery),
+        source: 'fallback',
+        error: message
+      };
+    }
+  }
+
+  window.productService = {
+    getCandidates: getCandidates,
+    categoryFor: categoryFor,
+    config: { endpoint: endpoint }
+  };
+}());

@@ -1,1 +1,78 @@
-window.recommendationService=(()=>{const config={endpoint:String(window.RECOMMENDATIONS_API_URL||'').trim()};async function getRecommendations(query){const candidateResult=await window.productService.getCandidates(query);const candidates=candidateResult.products;try{if(!config.endpoint)throw new Error('未配置 window.RECOMMENDATIONS_API_URL，未发起云函数请求');console.info('[recommendations] 请求云函数',{url:config.endpoint,query,candidateCount:candidates.length,candidateSource:candidateResult.source});const response=await fetch(config.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,candidates})});if(!response.ok)throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0,160)}`);const products=await response.json();if(!Array.isArray(products)||!products.length)throw new Error('API response is not a non-empty product array');console.info('[recommendations] 请求成功',{url:config.endpoint,productCount:products.length});return{products,source:'ai',error:null,candidateSource:candidateResult.source}}catch(error){const message=error instanceof Error?error.message:String(error);console.error('[recommendations] 请求失败，使用本地示例推荐',{url:config.endpoint||'(未配置)',query,error:message});return{products:candidates.slice(0,3),source:'fallback',error:message,candidateSource:candidateResult.source}}}return{getRecommendations,config}})();
+(function () {
+  'use strict';
+
+  var endpoint = String(window.RECOMMENDATIONS_API_URL || '').trim();
+
+  function fallbackRecommendation(query, candidates, error) {
+    return {
+      query: query,
+      summary: query,
+      products: candidates,
+      source: 'fallback',
+      error: error || null
+    };
+  }
+
+  async function getRecommendations(query) {
+    var cleanQuery = String(query || '').trim();
+
+    if (!window.productService || typeof window.productService.getCandidates !== 'function') {
+      throw new Error('product-service.js did not load before recommendation-service.js');
+    }
+
+    var candidateResult = await window.productService.getCandidates(cleanQuery);
+    var candidates = candidateResult.products || [];
+
+    if (!endpoint) {
+      console.warn('[recommendations] API URL is not configured; using product candidates');
+      return fallbackRecommendation(cleanQuery, candidates, 'window.RECOMMENDATIONS_API_URL is not configured');
+    }
+
+    try {
+      console.info('[recommendations] requesting AI analysis', {
+        url: endpoint,
+        query: cleanQuery,
+        candidateCount: candidates.length
+      });
+
+      var response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: cleanQuery, candidates: candidates })
+      });
+      var payload = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        throw new Error(payload.error || ('recommendations request failed: ' + response.status));
+      }
+
+      var apiProducts = Array.isArray(payload)
+        ? payload
+        : (Array.isArray(payload.products) ? payload.products : []);
+      var products = apiProducts.length ? apiProducts : candidates;
+
+      console.info('[recommendations] AI analysis request succeeded', {
+        count: products.length
+      });
+
+      return {
+        query: cleanQuery,
+        summary: payload.summary || cleanQuery,
+        products: products,
+        source: payload.source || 'ai',
+        error: candidateResult.error || null
+      };
+    } catch (error) {
+      var message = error && error.message ? error.message : String(error);
+      console.error('[recommendations] AI analysis request failed', { reason: message });
+      return fallbackRecommendation(cleanQuery, candidates, message);
+    }
+  }
+
+  window.recommendationService = {
+    getRecommendations: getRecommendations,
+    config: { endpoint: endpoint }
+  };
+}());

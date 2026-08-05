@@ -2,9 +2,15 @@
   'use strict';
 
   var defaultQuery = '\u9884\u7b97 5000 \u5143\uff0c\u63a8\u8350\u4e00\u53f0\u8f7b\u8584\u7b14\u8bb0\u672c';
-  var query = new URLSearchParams(location.search).get('q') || defaultQuery;
+  var savedClarification;
+  try {
+    savedClarification = JSON.parse(window.localStorage.getItem('shoppingClarification') || 'null');
+  } catch (error) {
+    savedClarification = null;
+  }
+  var query = new URLSearchParams(location.search).get('q') || (savedClarification && savedClarification.query) || defaultQuery;
   var loadingMessages = [
-    '\u6b63\u5728\u5206\u6790\u4f60\u7684\u9700\u6c42',
+    '\u6b63\u5728\u5206\u6790\u9002\u5408\u4f60\u7684\u9009\u62e9...',
     '\u6b63\u5728\u5bf9\u6bd4\u5546\u54c1\u4e0e\u9884\u7b97',
     '\u6b63\u5728\u751f\u6210\u63a8\u8350\u7406\u7531'
   ];
@@ -152,7 +158,11 @@
       '<div class="buy-links"><a href="detail.html?id=' + encodeURIComponent(item.id || '') + '">\u67e5\u770b\u8be6\u60c5</a><button type="button" data-store="\u4eac\u4e1c">\u4eac\u4e1c\u8d2d\u4e70</button><button type="button" data-store="\u6dd8\u5b9d">\u6dd8\u5b9d\u8d2d\u4e70</button></div></div></article>';
   }
 
-  var collectedAnswers = {};
+  var collectedAnswers = savedClarification && savedClarification.query === query ? {
+    budget: savedClarification.budget || '',
+    scenario: savedClarification.usage || '',
+    preference: savedClarification.priority || ''
+  } : {};
   var conversation = [{ role: 'user', text: query }];
   var activeLoadingTimer;
   var stageRequestId = 0;
@@ -211,7 +221,7 @@
     window.sessionStorage.setItem('aiRecommendations', JSON.stringify(products));
     var alerts = '';
     if (result.source === 'fallback') {
-      alerts += renderAlert('error', '\u6682\u65f6\u65e0\u6cd5\u5b8c\u6210 AI \u5206\u6790', '\u5f53\u524d\u663e\u793a\u5019\u9009\u5546\u54c1\u793a\u4f8b\u3002' + (result.error ? ' ' + result.error : ''));
+      alerts += renderAlert('info', 'AI\u6682\u65f6\u7e41\u5fd9\uff0c\u5df2\u4e3a\u4f60\u751f\u6210\u57fa\u7840\u63a8\u8350', '\u5f53\u524d\u7ed3\u679c\u4ec5\u57fa\u4e8e\u5df2\u7b5b\u9009\u7684\u5546\u54c1\u3002');
     } else if (result.candidateSource === 'fallback') {
       alerts += renderAlert('info', '\u5546\u54c1\u5e93\u8fde\u63a5\u5f02\u5e38', '\u5df2\u4f7f\u7528\u672c\u5730\u5019\u9009\u5546\u54c1\u5b8c\u6210 AI \u5206\u6790\u3002');
     }
@@ -233,7 +243,7 @@
     var products = context.candidates || [];
     reportTarget.hidden = true;
     reportTarget.innerHTML = '';
-    target.innerHTML = '<section class="ai-analysis-status" role="status"><span class="ai-analysis-status__dot" aria-hidden="true"></span><div><strong>AI\u6b63\u5728\u5206\u6790\u6700\u4f73\u9009\u62e9...</strong><p>\u5546\u54c1\u5019\u9009\u5df2\u52a0\u8f7d\uff0c\u6b63\u5728\u6839\u636e\u4f60\u7684\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002</p></div></section>' +
+    target.innerHTML = '<section class="ai-analysis-status" role="status"><span class="ai-analysis-status__dot" aria-hidden="true"></span><div><strong>\u6b63\u5728\u5206\u6790\u9002\u5408\u4f60\u7684\u9009\u62e9...</strong><p>\u5546\u54c1\u5019\u9009\u5df2\u52a0\u8f7d\uff0c\u6b63\u5728\u6839\u636e\u4f60\u7684\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002</p></div></section>' +
       (products.length ? '<div class="result-list result-list--pending">' + products.map(function (item, index) { return renderProduct(item, index + 1); }).join('') + '</div>' : '');
   }
 
@@ -241,9 +251,10 @@
     var products = context.candidates || [];
     reportTarget.hidden = true;
     reportTarget.innerHTML = '';
-    target.innerHTML = renderAlert('error', 'AI\u5206\u6790\u6682\u65f6\u5931\u8d25', '\u5546\u54c1\u5019\u9009\u5df2\u6b63\u5e38\u52a0\u8f7d\uff0c\u4f46 AI \u670d\u52a1\u672a\u80fd\u5b8c\u6210\u5206\u6790\u3002' + (error ? ' ' + error : '')) +
+    target.innerHTML = renderAlert('info', 'AI\u6682\u65f6\u7e41\u5fd9\uff0c\u5df2\u4e3a\u4f60\u751f\u6210\u57fa\u7840\u63a8\u8350', '\u5f53\u524d\u7ed3\u679c\u4ec5\u57fa\u4e8e\u5df2\u7b5b\u9009\u7684\u5546\u54c1\u3002') +
       (products.length ? '<div class="result-intro"><p>\u5019\u9009\u5546\u54c1</p><h3>\u4f60\u4ecd\u53ef\u4ee5\u67e5\u770b\u4ee5\u4e0b\u5546\u54c1</h3></div><div class="result-list">' + products.map(function (item, index) { return renderProduct(item, index + 1); }).join('') + '</div>' : '');
-    console.error('[AI] render failed', { reason: error || 'unknown error', candidateCount: products.length });
+    console.error('[AI RESPONSE]', { status: 'failed', reason: error || 'unknown error', candidateCount: products.length });
+    console.warn('[FALLBACK]', { candidateCount: products.length, category: context.criteria && context.criteria.category });
   }
 
   async function requestStage(target, reportTarget, loadingText) {
@@ -256,16 +267,16 @@
       window.clearInterval(activeLoadingTimer);
       target.setAttribute('aria-busy', 'true');
       renderCandidateLoading(context, target, reportTarget);
-      console.info('[AI] request start', { candidateCount: context.candidates.length, requestId: requestId });
+      console.info('[AI REQUEST]', { candidateCount: context.candidates.length, requestId: requestId });
 
       var result = await window.recommendationService.requestAiAnalysis(context);
       if (requestId !== stageRequestId) return;
-      console.info('[AI] response received', { stage: result.stage, requestId: requestId });
+      console.info('[AI RESPONSE]', { stage: result.stage, requestId: requestId });
       if (result.stage === 'collecting_requirements') renderConversation(result, target, reportTarget);
       else renderRecommendations(result, target, reportTarget);
     } catch (error) {
       if (requestId !== stageRequestId) return;
-      console.error('[AI] render failed', error);
+      console.error('[AI RESPONSE]', { status: 'failed', reason: error && error.message ? error.message : String(error) });
       if (typeof context !== 'undefined') renderAiFailure(context, target, reportTarget, error && error.message ? error.message : String(error));
       else target.innerHTML = renderAlert('error', '\u63a8\u8350\u9875\u52a0\u8f7d\u5931\u8d25', '\u65e0\u6cd5\u52a0\u8f7d\u5546\u54c1\u5019\u9009\uff0c\u8bf7\u8fd4\u56de\u9996\u9875\u91cd\u8bd5\u3002');
     } finally {

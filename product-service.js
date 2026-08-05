@@ -3,10 +3,11 @@
 
   var endpoint = String(window.PRODUCTS_API_URL || '').trim();
   var categoryRules = {
+    '\u98df\u54c1': ['\u96f6\u98df', '\u98df\u54c1', '\u5403', '\u98df\u7269', '\u51bb\u5e72', '\u72d7\u7cae', '\u732b\u7cae'],
     '\u624b\u673a': ['\u624b\u673a', '\u62cd\u7167', '\u5f71\u50cf', '\u6e38\u620f'],
     '\u7535\u8111': ['\u7535\u8111', '\u7b14\u8bb0\u672c', '\u8f7b\u8584', '\u529e\u516c', '\u5b66\u4e60', '\u526a\u8f91'],
     '\u6570\u7801': ['\u8033\u673a', '\u964d\u566a', '\u97f3\u7bb1', '\u5e73\u677f', '\u76f8\u673a', '\u6295\u5f71'],
-    '\u5ba0\u7269\u7528\u54c1': ['\u5ba0\u7269', '\u732b', '\u72d7', '\u732b\u7cae', '\u72d7\u7cae', '\u73a9\u5177'],
+    '\u5ba0\u7269\u7528\u54c1': ['\u5ba0\u7269', '\u732b', '\u72d7', '\u73a9\u5177', '\u996e\u6c34', '\u62a4\u7406'],
     '\u5bb6\u5c45': ['\u5bb6\u5c45', '\u6e05\u6d01', '\u7761\u7720', '\u53a8\u623f', '\u6536\u7eb3'],
     '\u793c\u7269': ['\u793c\u7269', '\u9001\u793c', '\u751f\u65e5', '\u7eaa\u5ff5']
   };
@@ -61,22 +62,32 @@
     };
   }
 
+  function productText(product) {
+    return [product.name, product.category, product.description, product.brand]
+      .concat(Array.isArray(product.tags) ? product.tags : [])
+      .join(' ');
+  }
+
+  function filterProducts(products, query, category) {
+    var source = Array.isArray(products) ? products : [];
+    var cleanQuery = String(query || '').trim();
+    var filtered = category
+      ? source.filter(function (product) { return product.category === category; })
+      : source.filter(function (product) { return cleanQuery && productText(product).indexOf(cleanQuery) !== -1; });
+
+    console.info('[PRODUCT FILTER]', {
+      query: cleanQuery,
+      category: category || 'unclassified',
+      inputCount: source.length,
+      candidateCount: filtered.length
+    });
+    return filtered.slice(0, 10);
+  }
+
   function getLocalProducts(query) {
     var source = Array.isArray(window.productDatabase) ? window.productDatabase : [];
     var category = categoryFor(query);
-    var matched = source;
-
-    if (category) {
-      matched = source.filter(function (product) {
-        return product && product.category === category;
-      });
-    }
-
-    if (!matched.length) {
-      matched = source;
-    }
-
-    return matched.slice(0, 12).map(normalizeProduct);
+    return filterProducts(source.map(normalizeProduct), query, category);
   }
 
   async function getCandidates(query) {
@@ -100,7 +111,7 @@
         body: JSON.stringify({
           keyword: category ? '' : cleanQuery,
           category: category,
-          limit: 12
+          limit: 10
         })
       });
 
@@ -115,16 +126,17 @@
       var products = Array.isArray(payload)
         ? payload
         : (Array.isArray(payload.products) ? payload.products : []);
-      if (!products.length) {
+      var filteredProducts = filterProducts(products.map(normalizeProduct), cleanQuery, category);
+      if (!filteredProducts.length) {
         throw new Error('products collection returned no candidates');
       }
 
       console.info('[products] CloudBase catalog request succeeded', {
-        count: products.length
+        count: filteredProducts.length
       });
 
       return {
-        products: products.map(normalizeProduct),
+        products: filteredProducts,
         source: 'database',
         error: null
       };

@@ -179,7 +179,9 @@ async function askModel({ baseUrl, apiKey, model, prompt, timeoutMs, context }) 
     throw error;
   } finally {
     clearTimeout(timeoutId);
-    console.log('[recommendations] after hunyuan request', JSON.stringify({ requestId: context.requestId, durationMs: Date.now() - startedAt, status: responseStatus || 'no-response' }));
+    const durationMs = Date.now() - startedAt;
+    console.log('[recommendations] after hunyuan request', JSON.stringify({ requestId: context.requestId, durationMs, status: responseStatus || 'no-response' }));
+    console.log('[recommendations] model response time=', durationMs);
   }
 }
 
@@ -194,6 +196,8 @@ async function handleRequest(event) {
     const query = String(body.query || '').trim();
     const candidates = Array.isArray(body.candidates) ? body.candidates : [];
     context.candidateCount = candidates.length;
+    console.log('[recommendations] query=', query);
+    console.log('[recommendations] candidate count=', candidates.length);
     if (!query || query.length > 300) return returnWithLog(400, { error: 'query is required and must be 300 characters or fewer' }, context);
 
     const profile = collectProfile(body, query);

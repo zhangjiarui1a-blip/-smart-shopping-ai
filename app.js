@@ -1,6 +1,18 @@
 const form = document.querySelector('#assistantForm');
 const input = document.querySelector('#recommendationInput');
 const button = document.querySelector('#recommendButton');
+let entrySource = 'search';
+
+input.placeholder = '\u63cf\u8ff0\u4f60\u7684\u9700\u6c42\uff0cAI\u5e2e\u4f60\u627e\u5230\u6700\u9002\u5408\u7684\u9009\u62e9';
+
+function beginRecommendation(source, query) {
+  const entry = { source, query: String(query || '').trim(), candidates: [] };
+  window.sessionStorage.setItem('shoppingRecommendationEntry', JSON.stringify(entry));
+  console.info('[ENTRY] source=', entry.source);
+  console.info('[ENTRY] query=', entry.query);
+  console.info('[ENTRY] candidates length=', entry.candidates.length);
+  window.location.href = `clarify.html?q=${encodeURIComponent(entry.query)}`;
+}
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -8,13 +20,22 @@ form.addEventListener('submit', event => {
   button.disabled = true;
   button.querySelector('span').textContent = '分析中';
   window.setTimeout(() => {
-    window.location.href = `result.html?q=${encodeURIComponent(query)}`;
+    beginRecommendation(entrySource, query);
   }, 320);
 });
 
 document.querySelectorAll('[data-prompt]').forEach(chip => {
   chip.addEventListener('click', () => {
+    entrySource = 'quick_prompt';
     input.value = chip.dataset.prompt;
     form.requestSubmit();
+  });
+});
+
+document.querySelectorAll('.categories a').forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    const query = new URL(link.href).searchParams.get('q') || link.textContent.trim();
+    beginRecommendation('category', query);
   });
 });

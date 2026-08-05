@@ -27,7 +27,23 @@
     return Object.keys(answers || {}).map(function (key) { return answers[key]; }).join(' ');
   }
 
+  function readEntry(query) {
+    try {
+      var saved = JSON.parse(window.sessionStorage.getItem('shoppingRecommendationEntry') || 'null');
+      if (saved && saved.query === query && Array.isArray(saved.candidates)) return saved;
+    } catch (error) {
+      console.warn('[ENTRY] unable to read saved entry', error);
+    }
+    return { source: 'search', query: query, candidates: [] };
+  }
+
   function fallbackRecommendation(context, error) {
+    console.warn('[FALLBACK]', {
+      query: context.query,
+      category: context.criteria.category || 'unclassified',
+      candidateCount: context.candidates.length,
+      reason: error || 'AI unavailable'
+    });
     return {
       stage: 'recommend',
       query: context.query,
@@ -43,6 +59,7 @@
   async function loadCandidateContext(query, answers) {
     var cleanQuery = String(query || '').trim();
     var collectedAnswers = answers && typeof answers === 'object' ? answers : {};
+    var entry = readEntry(cleanQuery);
 
     if (!window.productService || typeof window.productService.getCandidates !== 'function') {
       throw new Error('product-service.js did not load before recommendation-service.js');
@@ -55,10 +72,16 @@
       ? window.productService.categoryFor(candidateQuery)
       : '';
 
+    var candidates = applyBudget(candidateResult.products || [], budget).slice(0, 10);
+    console.info('[ENTRY] source=', entry.source);
+    console.info('[ENTRY] query=', cleanQuery);
+    console.info('[ENTRY] candidates length=', candidates.length);
+
     return {
       query: cleanQuery,
+      entry: { source: entry.source, query: cleanQuery, candidates: candidates },
       answers: collectedAnswers,
-      candidates: applyBudget(candidateResult.products || [], budget),
+      candidates: candidates,
       criteria: { budget: budget, category: category },
       candidateSource: candidateResult.source,
       candidateError: candidateResult.error || null
@@ -70,7 +93,11 @@
       throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
     }
 
-    console.info('[AI] request start', {
+    if (!context.candidates.length) {
+      return fallbackRecommendation(context, 'No matching products after category filter');
+    }
+
+    console.info('[AI REQUEST]', {
       url: endpoint,
       query: context.query,
       candidateCount: context.candidates.length,
@@ -89,7 +116,7 @@
     });
     var payload = await response.json().catch(function () { return {}; });
 
-    console.info('[AI] response received', {
+    console.info('[AI RESPONSE]', {
       status: response.status,
       stage: payload && payload.stage ? payload.stage : 'legacy'
     });
@@ -138,7 +165,7 @@
       return await requestAiAnalysis(context);
     } catch (error) {
       var message = error && error.message ? error.message : String(error);
-      console.error('[recommendations] request failed', { reason: message });
+      console.error('[AI RESPONSE]', { status: 'failed', reason: message });
       return fallbackRecommendation(context, message);
     }
   }

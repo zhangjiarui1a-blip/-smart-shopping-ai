@@ -2,6 +2,7 @@
   'use strict';
 
   var CATEGORIES = {
+    food: '\u98df\u54c1',
     phone: '\u624b\u673a',
     computer: '\u7535\u8111',
     digital: '\u6570\u7801',
@@ -77,6 +78,18 @@
         ['pet-carrier-backpack', 'Pet Carrier', 159, 'Petwise', ['\u5ba0\u7269', '\u51fa\u884c', '\u732b\u72d7']],
         ['pet-grooming-set', 'Grooming Set', 79, 'Petwise', ['\u5ba0\u7269', '\u62a4\u7406', '\u6e05\u6d01']],
         ['pet-smart-feeder', 'Smart Feeder', 399, 'Petwise', ['\u5ba0\u7269', '\u5582\u98df', '\u667a\u80fd']]
+      ]
+    },
+    {
+      category: CATEGORIES.food,
+      image: 'watch',
+      audience: '\u9700\u8981\u9009\u62e9\u96f6\u98df\u6216\u5ba0\u7269\u98df\u54c1\u7684\u7528\u6237',
+      items: [
+        ['food-freeze-dried-snacks', 'Freeze Dried Snacks', 99, 'Petwise', ['\u98df\u54c1', '\u96f6\u98df', '\u51bb\u5e72']],
+        ['food-cat-creamy-treats', 'Cat Creamy Treats', 79, 'Petwise', ['\u98df\u54c1', '\u732b\u96f6\u98df', '\u9002\u53e3\u6027']],
+        ['food-dog-training-treats', 'Dog Training Treats', 89, 'Petwise', ['\u98df\u54c1', '\u72d7\u96f6\u98df', '\u8bad\u7ec3']],
+        ['food-nutrition-dog-food', 'Nutrition Dog Food', 239, 'Petwise', ['\u98df\u54c1', '\u72d7\u7cae', '\u4e3b\u7cae']],
+        ['food-protein-cat-food', 'Protein Cat Food', 269, 'Petwise', ['\u98df\u54c1', '\u732b\u7cae', '\u9ad8\u86cb\u767d']]
       ]
     },
     {

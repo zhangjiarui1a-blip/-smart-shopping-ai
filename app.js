@@ -6,12 +6,17 @@ let entrySource = 'search';
 input.placeholder = '\u63cf\u8ff0\u4f60\u7684\u9700\u6c42\uff0cAI\u5e2e\u4f60\u627e\u5230\u6700\u9002\u5408\u7684\u9009\u62e9';
 
 function beginRecommendation(source, query) {
-  const entry = { source, query: String(query || '').trim(), candidates: [] };
+  const cleanQuery = String(query || '').trim();
+  const clarification = window.clarificationService
+    ? window.clarificationService.evaluate(cleanQuery)
+    : { needClarification: false, questions: [], query: cleanQuery };
+  const entry = { source, query: cleanQuery, candidates: [] };
   window.sessionStorage.setItem('shoppingRecommendationEntry', JSON.stringify(entry));
+  window.sessionStorage.setItem('shoppingClarificationDecision', JSON.stringify(clarification));
   console.info('[ENTRY] source=', entry.source);
   console.info('[ENTRY] query=', entry.query);
   console.info('[ENTRY] candidates length=', entry.candidates.length);
-  window.location.href = `clarify.html?q=${encodeURIComponent(entry.query)}`;
+  window.location.href = `${clarification.needClarification ? 'clarification.html' : 'result.html'}?q=${encodeURIComponent(entry.query)}`;
 }
 
 form.addEventListener('submit', event => {

@@ -243,7 +243,7 @@
     var products = context.candidates || [];
     reportTarget.hidden = true;
     reportTarget.innerHTML = '';
-    target.innerHTML = '<section class="ai-analysis-status" role="status"><span class="ai-analysis-status__dot" aria-hidden="true"></span><div><strong>\u6b63\u5728\u5206\u6790\u9002\u5408\u4f60\u7684\u9009\u62e9...</strong><p>\u5546\u54c1\u5019\u9009\u5df2\u52a0\u8f7d\uff0c\u6b63\u5728\u6839\u636e\u4f60\u7684\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002</p></div></section>' +
+    target.innerHTML = '<section class="ai-analysis-status" role="status"><span class="ai-analysis-status__dot" aria-hidden="true"></span><div><strong>AI\u6b63\u5728\u5206\u6790\u6700\u4f73\u9009\u62e9...</strong><p>\u5546\u54c1\u5019\u9009\u5df2\u52a0\u8f7d\uff0c\u6b63\u5728\u6839\u636e\u4f60\u7684\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002</p></div></section>' +
       (products.length ? '<div class="result-list result-list--pending">' + products.map(function (item, index) { return renderProduct(item, index + 1); }).join('') + '</div>' : '');
   }
 
@@ -268,6 +268,9 @@
       target.setAttribute('aria-busy', 'true');
       renderCandidateLoading(context, target, reportTarget);
       console.info('[AI REQUEST]', { candidateCount: context.candidates.length, requestId: requestId });
+
+      await new Promise(function (resolve) { window.requestAnimationFrame(resolve); });
+      if (requestId !== stageRequestId) return;
 
       var result = await window.recommendationService.requestAiAnalysis(context);
       if (requestId !== stageRequestId) return;

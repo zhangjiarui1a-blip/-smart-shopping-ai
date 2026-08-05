@@ -3,7 +3,7 @@
 
   var endpoint = String(window.PRODUCTS_API_URL || '').trim();
   var categoryRules = {
-    '\u98df\u54c1': ['\u96f6\u98df', '\u98df\u54c1', '\u5403', '\u98df\u7269', '\u51bb\u5e72', '\u72d7\u7cae', '\u732b\u7cae'],
+    '\u98df\u54c1': ['\u96f6\u98df', '\u98df\u54c1', '\u5403', '\u98df\u7269', '\u51bb\u5e72', '\u996e\u6599'],
     '\u624b\u673a': ['\u624b\u673a', '\u62cd\u7167', '\u5f71\u50cf', '\u6e38\u620f'],
     '\u7535\u8111': ['\u7535\u8111', '\u7b14\u8bb0\u672c', '\u8f7b\u8584', '\u529e\u516c', '\u5b66\u4e60', '\u526a\u8f91'],
     '\u6570\u7801': ['\u8033\u673a', '\u964d\u566a', '\u97f3\u7bb1', '\u5e73\u677f', '\u76f8\u673a', '\u6295\u5f71'],
@@ -15,6 +15,10 @@
   function categoryFor(query) {
     var text = String(query || '');
     var categories = Object.keys(categoryRules);
+
+    if (text.indexOf('\u72d7\u7cae') !== -1 || text.indexOf('\u732b\u7cae') !== -1) {
+      return '\u5ba0\u7269\u7528\u54c1';
+    }
 
     for (var i = 0; i < categories.length; i += 1) {
       var category = categories[i];
@@ -87,7 +91,12 @@
   function getLocalProducts(query) {
     var source = Array.isArray(window.productDatabase) ? window.productDatabase : [];
     var category = categoryFor(query);
-    return filterProducts(source.map(normalizeProduct), query, category);
+    var normalized = source.map(normalizeProduct);
+    return {
+      products: filterProducts(normalized, query, category),
+      beforeFilter: normalized.length,
+      category: category
+    };
   }
 
   async function getCandidates(query) {
@@ -138,16 +147,21 @@
       return {
         products: filteredProducts,
         source: 'database',
-        error: null
+        error: null,
+        beforeFilter: products.length,
+        category: category
       };
     } catch (error) {
       var message = error && error.message ? error.message : String(error);
       console.warn('[products] using local fallback', { reason: message });
 
+      var localResult = getLocalProducts(cleanQuery);
       return {
-        products: getLocalProducts(cleanQuery),
+        products: localResult.products,
         source: 'fallback',
-        error: message
+        error: message,
+        beforeFilter: localResult.beforeFilter,
+        category: localResult.category
       };
     }
   }

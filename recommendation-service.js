@@ -56,6 +56,19 @@
     };
   }
 
+  function emptyRecommendation(context) {
+    return {
+      stage: 'recommend',
+      query: context.query,
+      profile: context.criteria,
+      products: [],
+      source: 'empty',
+      candidateSource: context.candidateSource,
+      error: null,
+      answers: context.answers
+    };
+  }
+
   async function loadCandidateContext(query, answers) {
     var cleanQuery = String(query || '').trim();
     var collectedAnswers = answers && typeof answers === 'object' ? answers : {};
@@ -73,6 +86,10 @@
       : '';
 
     var candidates = applyBudget(candidateResult.products || [], budget).slice(0, 10);
+    console.info('[recommendation] user query:', cleanQuery);
+    console.info('[recommendation] detected category:', category || 'unclassified');
+    console.info('[recommendation] candidates before filter:', Number(candidateResult.beforeFilter) || 0);
+    console.info('[recommendation] candidates after filter:', candidates.length);
     console.info('[ENTRY] source=', entry.source);
     console.info('[ENTRY] query=', cleanQuery);
     console.info('[ENTRY] candidates length=', candidates.length);
@@ -94,7 +111,8 @@
     }
 
     if (!context.candidates.length) {
-      return fallbackRecommendation(context, 'No matching products after category filter');
+      console.warn('[FALLBACK]', { query: context.query, reason: 'No matching products after category filter' });
+      return emptyRecommendation(context);
     }
 
     console.info('[AI REQUEST]', {

@@ -41,8 +41,9 @@ function queryBudget(query) {
 
 function categoryFrom(text) {
   const source = String(text || '');
+  if (source.includes('\u72d7\u7cae') || source.includes('\u732b\u7cae')) return '\u5ba0\u7269\u7528\u54c1';
   const rules = [
-    ['\u98df\u54c1', ['\u96f6\u98df', '\u98df\u54c1', '\u5403', '\u98df\u7269', '\u51bb\u5e72', '\u72d7\u7cae', '\u732b\u7cae']],
+    ['\u98df\u54c1', ['\u96f6\u98df', '\u98df\u54c1', '\u5403', '\u98df\u7269', '\u51bb\u5e72', '\u996e\u6599']],
     ['\u624b\u673a', ['\u624b\u673a', '\u62cd\u7167', '\u5f71\u50cf']],
     ['\u7535\u8111', ['\u7535\u8111', '\u7b14\u8bb0\u672c', '\u53f0\u5f0f']],
     ['\u6570\u7801', ['\u6570\u7801', '\u8033\u673a', '\u97f3\u7bb1', '\u5e73\u677f', '\u76f8\u673a', '\u6295\u5f71']],

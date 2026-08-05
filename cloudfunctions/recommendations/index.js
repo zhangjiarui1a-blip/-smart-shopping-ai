@@ -1,5 +1,3 @@
-console.log('FUNCTION_START');
-
 const reply = (statusCode, data) => ({
   statusCode,
   headers: {
@@ -12,14 +10,26 @@ const reply = (statusCode, data) => ({
 });
 
 const bodyFrom = event => typeof event.body === 'string' ? JSON.parse(event.body || '{}') : (event.body || event);
+
 const parseArray = text => {
   const match = text.match(/\[[\s\S]*\]/);
   if (!match) throw new Error('Model response contains no JSON array');
   return JSON.parse(match[0]);
 };
 
+function returnWithLog(statusCode, data, context) {
+  console.log('[RETURN]', JSON.stringify({
+    requestId: context.requestId,
+    statusCode,
+    productCount: Array.isArray(data) ? data.length : undefined,
+    error: data && data.error ? data.error : undefined
+  }));
+  return reply(statusCode, data);
+}
+
 function queryBudget(query) {
-  const match = String(query || '').match(/(?:\u9884\u7b97|\u4e0d\u8d85\u8fc7|\u4ee5\u5185|\u5143\u5185)[^0-9]{0,8}(\d{3,7})/) || String(query || '').match(/(\d{3,7})\s*\u5143/);
+  const text = String(query || '');
+  const match = text.match(/(?:\u9884\u7b97|\u4e0d\u8d85\u8fc7|\u4ee5\u5185|\u5143\u5185)[^0-9]{0,8}(\d{3,7})/) || text.match(/(\d{3,7})\s*\u5143/);
   return match ? Number(match[1]) : null;
 }
 
@@ -30,21 +40,16 @@ function recommendationCriteria(body, query) {
   return { budget: budget || null, category: category || null };
 }
 
-async function resolveModel(baseUrl, apiKey) {
-  const configuredModel = process.env.TOKENHUB_MODEL;
-  if (configuredModel && configuredModel !== 'hy3-preview') return configuredModel;
-  if (configuredModel === 'hy3-preview') console.warn('[recommendations] Replacing unavailable model hy3-preview with hy3');
-  if (configuredModel === 'hy3-preview') return 'hy3';
+function configuredModel() {
+  const value = String(process.env.TOKENHUB_MODEL || '').trim();
+  if (value && value !== 'hy3-preview') return value;
+  if (value === 'hy3-preview') console.warn('[START] Deprecated TOKENHUB_MODEL hy3-preview replaced with hy3');
+  return 'hy3';
+}
 
-  const response = await fetch(`${baseUrl}/models`, { headers: { Authorization: `Bearer ${apiKey}` } });
-  if (!response.ok) throw new Error(`TokenHub model discovery returned ${response.status}: ${(await response.text()).slice(0, 300)}`);
-  const models = (await response.json()).data || [];
-  const ids = models.map(model => model.id).filter(Boolean);
-  console.log('[recommendations] TokenHub available models:', ids);
-  const preferred = ids.includes('hy3') ? 'hy3' : (ids.find(id => /hunyuan|hy/i.test(id)) || ids[0]);
-  if (!preferred) throw new Error('TokenHub returned no available models for this API Key');
-  console.log('[recommendations] TokenHub selected model:', preferred);
-  return preferred;
+function requestTimeout() {
+  const timeout = Number(process.env.AI_REQUEST_TIMEOUT_MS || 25000);
+  return Math.min(Math.max(timeout, 3000), 45000);
 }
 
 function buildPrompt(query, criteria, candidates) {
@@ -69,40 +74,99 @@ function buildPrompt(query, criteria, candidates) {
   ].join('\n');
 }
 
+async function askModel({ baseUrl, apiKey, model, prompt, timeoutMs, context }) {
+  const controller = new AbortController();
+  const startedAt = Date.now();
+  let timeoutId;
+
+  console.log('[AI ANALYSIS BEGIN]', JSON.stringify({
+    requestId: context.requestId,
+    model,
+    timeoutMs,
+    candidateCount: context.candidateCount
+  }));
+
+  try {
+    timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.2,
+        max_tokens: 700
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Hunyuan returned ${response.status}: ${(await response.text()).slice(0, 300)}`);
+    }
+
+    const payload = await response.json();
+    return payload.choices?.[0]?.message?.content || '';
+  } catch (error) {
+    if (controller.signal.aborted) {
+      const timeoutError = new Error(`AI request timed out after ${timeoutMs}ms`);
+      timeoutError.code = 'AI_TIMEOUT';
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+    console.log('[AI ANALYSIS END]', JSON.stringify({
+      requestId: context.requestId,
+      durationMs: Date.now() - startedAt
+    }));
+  }
+}
+
 async function handleRequest(event) {
-  if (event.httpMethod === 'OPTIONS') return reply(204, '');
+  const context = {
+    requestId: event.requestId || event.requestID || 'unknown',
+    candidateCount: 0
+  };
+  console.log('[START]', JSON.stringify({ requestId: context.requestId, method: event.httpMethod || 'POST' }));
+
+  if (event.httpMethod === 'OPTIONS') return returnWithLog(204, '', context);
+
   const body = bodyFrom(event);
   const query = String(body.query || '').trim();
   const candidates = Array.isArray(body.candidates) ? body.candidates : [];
-  console.log('[recommendations] query:', query);
-  console.log('[recommendations] candidate count:', candidates.length);
+  context.candidateCount = candidates.length;
+  console.log('[INPUT]', JSON.stringify({ requestId: context.requestId, query, candidateCount: candidates.length }));
 
-  if (!query || query.length > 300) return reply(400, { error: 'query is required and must be 300 characters or fewer' });
-  if (!candidates.length) return reply(400, { error: 'candidates are required' });
+  if (!query || query.length > 300) {
+    return returnWithLog(400, { error: 'query is required and must be 300 characters or fewer' }, context);
+  }
+  if (!candidates.length) return returnWithLog(400, { error: 'candidates are required' }, context);
 
   const apiKey = process.env.TOKENHUB_API_KEY || process.env.HUNYUAN_API_KEY;
-  if (!apiKey) return reply(500, { error: 'TOKENHUB_API_KEY is not configured' });
+  if (!apiKey) return returnWithLog(500, { error: 'TOKENHUB_API_KEY is not configured' }, context);
 
   const criteria = recommendationCriteria(body, query);
   const safeCandidates = candidates.slice(0, 12).map(({ id, name, category, price, tags }) => ({ id, name, category, price, tags }));
-  console.log('[recommendations] criteria:', JSON.stringify(criteria));
-
   const baseUrl = (process.env.TOKENHUB_BASE_URL || 'https://tokenhub.tencentmaas.com/v1').replace(/\/$/, '');
-  const model = await resolveModel(baseUrl, apiKey);
-  const response = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: 'user', content: buildPrompt(query, criteria, safeCandidates) }],
-      temperature: 0.2
-    })
-  });
-  if (!response.ok) throw new Error(`Hunyuan returned ${response.status}: ${(await response.text()).slice(0, 300)}`);
+  const model = configuredModel();
 
-  const payload = await response.json();
-  const text = payload.choices?.[0]?.message?.content || '';
-  console.log('[recommendations] Hunyuan text:', text);
+  console.log('[INPUT]', JSON.stringify({
+    requestId: context.requestId,
+    criteria,
+    model,
+    candidateCount: safeCandidates.length
+  }));
+
+  const text = await askModel({
+    baseUrl,
+    apiKey,
+    model,
+    prompt: buildPrompt(query, criteria, safeCandidates),
+    timeoutMs: requestTimeout(),
+    context
+  });
+
+  console.log('[RECOMMEND BEGIN]', JSON.stringify({ requestId: context.requestId, phase: 'parse-model-response' }));
   const selected = parseArray(text).map(pick => {
     const item = candidates.find(candidate => candidate.id === pick.id);
     return item && {
@@ -113,15 +177,27 @@ async function handleRequest(event) {
   }).filter(Boolean).slice(0, 3);
 
   if (!selected.length) throw new Error('No candidate IDs matched model response');
-  console.log('[recommendations] final products:', JSON.stringify(selected));
-  return reply(200, selected);
+
+  console.log('[RECOMMEND END]', JSON.stringify({ requestId: context.requestId, productCount: selected.length }));
+  return returnWithLog(200, selected, context);
 }
 
 exports.main = async event => {
+  const safeEvent = event || {};
+  const context = { requestId: safeEvent.requestId || safeEvent.requestID || 'unknown' };
+
   try {
-    return await handleRequest(event || {});
+    return await handleRequest(safeEvent);
   } catch (error) {
-    console.error(error.stack || error);
-    return reply(500, { error: 'Failed to generate recommendations', detail: error.message || String(error) });
+    console.error('[RECOMMEND END]', JSON.stringify({
+      requestId: context.requestId,
+      error: error.message || String(error),
+      code: error.code || 'AI_REQUEST_FAILED'
+    }));
+    return returnWithLog(error.code === 'AI_TIMEOUT' ? 504 : 500, {
+      error: 'Failed to generate recommendations',
+      detail: error.message || String(error),
+      code: error.code || 'AI_REQUEST_FAILED'
+    }, context);
   }
 };

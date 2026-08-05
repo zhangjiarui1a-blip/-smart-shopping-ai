@@ -155,6 +155,7 @@
   var collectedAnswers = {};
   var conversation = [{ role: 'user', text: query }];
   var activeLoadingTimer;
+  var stageRequestId = 0;
 
   function showLoading(target, text) {
     window.clearInterval(activeLoadingTimer);
@@ -225,19 +226,50 @@
     target.querySelectorAll('[data-store]').forEach(function (button) {
       button.addEventListener('click', function () { button.textContent = button.dataset.store + '\u5165\u53e3\uff08\u6a21\u62df\uff09'; });
     });
+    console.info('[AI] render success', { productCount: products.length });
+  }
+
+  function renderCandidateLoading(context, target, reportTarget) {
+    var products = context.candidates || [];
+    reportTarget.hidden = true;
+    reportTarget.innerHTML = '';
+    target.innerHTML = '<section class="ai-analysis-status" role="status"><span class="ai-analysis-status__dot" aria-hidden="true"></span><div><strong>AI\u6b63\u5728\u5206\u6790\u6700\u4f73\u9009\u62e9...</strong><p>\u5546\u54c1\u5019\u9009\u5df2\u52a0\u8f7d\uff0c\u6b63\u5728\u6839\u636e\u4f60\u7684\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002</p></div></section>' +
+      (products.length ? '<div class="result-list result-list--pending">' + products.map(function (item, index) { return renderProduct(item, index + 1); }).join('') + '</div>' : '');
+  }
+
+  function renderAiFailure(context, target, reportTarget, error) {
+    var products = context.candidates || [];
+    reportTarget.hidden = true;
+    reportTarget.innerHTML = '';
+    target.innerHTML = renderAlert('error', 'AI\u5206\u6790\u6682\u65f6\u5931\u8d25', '\u5546\u54c1\u5019\u9009\u5df2\u6b63\u5e38\u52a0\u8f7d\uff0c\u4f46 AI \u670d\u52a1\u672a\u80fd\u5b8c\u6210\u5206\u6790\u3002' + (error ? ' ' + error : '')) +
+      (products.length ? '<div class="result-intro"><p>\u5019\u9009\u5546\u54c1</p><h3>\u4f60\u4ecd\u53ef\u4ee5\u67e5\u770b\u4ee5\u4e0b\u5546\u54c1</h3></div><div class="result-list">' + products.map(function (item, index) { return renderProduct(item, index + 1); }).join('') + '</div>' : '');
+    console.error('[AI] render failed', { reason: error || 'unknown error', candidateCount: products.length });
   }
 
   async function requestStage(target, reportTarget, loadingText) {
+    var requestId = ++stageRequestId;
     showLoading(target, loadingText);
     try {
-      var result = await window.recommendationService.getRecommendations(query, collectedAnswers);
+      var context = await window.recommendationService.loadCandidateContext(query, collectedAnswers);
+      if (requestId !== stageRequestId) return;
+
+      window.clearInterval(activeLoadingTimer);
+      target.setAttribute('aria-busy', 'true');
+      renderCandidateLoading(context, target, reportTarget);
+      console.info('[AI] request start', { candidateCount: context.candidates.length, requestId: requestId });
+
+      var result = await window.recommendationService.requestAiAnalysis(context);
+      if (requestId !== stageRequestId) return;
+      console.info('[AI] response received', { stage: result.stage, requestId: requestId });
       if (result.stage === 'collecting_requirements') renderConversation(result, target, reportTarget);
       else renderRecommendations(result, target, reportTarget);
     } catch (error) {
-      console.error('[result] failed to process recommendation stage', error);
-      target.innerHTML = renderAlert('error', '\u63a8\u8350\u9875\u52a0\u8f7d\u5931\u8d25', '\u8bf7\u8fd4\u56de\u9996\u9875\u540e\u91cd\u65b0\u63d0\u4ea4\u9700\u6c42\u3002');
+      if (requestId !== stageRequestId) return;
+      console.error('[AI] render failed', error);
+      if (typeof context !== 'undefined') renderAiFailure(context, target, reportTarget, error && error.message ? error.message : String(error));
+      else target.innerHTML = renderAlert('error', '\u63a8\u8350\u9875\u52a0\u8f7d\u5931\u8d25', '\u65e0\u6cd5\u52a0\u8f7d\u5546\u54c1\u5019\u9009\uff0c\u8bf7\u8fd4\u56de\u9996\u9875\u91cd\u8bd5\u3002');
     } finally {
-      stopLoading(target);
+      if (requestId === stageRequestId) stopLoading(target);
     }
   }
 

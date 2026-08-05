@@ -27,19 +27,20 @@
     return Object.keys(answers || {}).map(function (key) { return answers[key]; }).join(' ');
   }
 
-  function fallbackRecommendation(query, candidates, error, candidateSource, answers) {
+  function fallbackRecommendation(context, error) {
     return {
       stage: 'recommend',
-      query: query,
-      products: candidates.slice(0, 3),
+      query: context.query,
+      profile: context.criteria,
+      products: context.candidates.slice(0, 3),
       source: 'fallback',
-      candidateSource: candidateSource || 'fallback',
+      candidateSource: context.candidateSource,
       error: error || null,
-      answers: answers || {}
+      answers: context.answers
     };
   }
 
-  async function getRecommendations(query, answers) {
+  async function loadCandidateContext(query, answers) {
     var cleanQuery = String(query || '').trim();
     var collectedAnswers = answers && typeof answers === 'object' ? answers : {};
 
@@ -49,75 +50,102 @@
 
     var candidateQuery = (cleanQuery + ' ' + answerText(collectedAnswers)).trim();
     var candidateResult = await window.productService.getCandidates(candidateQuery);
-    var allCandidates = candidateResult.products || [];
     var budget = extractBudget(candidateQuery);
     var category = typeof window.productService.categoryFor === 'function'
       ? window.productService.categoryFor(candidateQuery)
       : '';
-    var candidates = applyBudget(allCandidates, budget);
-    var criteria = { budget: budget, category: category };
 
+    return {
+      query: cleanQuery,
+      answers: collectedAnswers,
+      candidates: applyBudget(candidateResult.products || [], budget),
+      criteria: { budget: budget, category: category },
+      candidateSource: candidateResult.source,
+      candidateError: candidateResult.error || null
+    };
+  }
+
+  async function requestAiAnalysis(context) {
     if (!endpoint) {
-      console.warn('[recommendations] API URL is not configured; using product candidates');
-      return fallbackRecommendation(cleanQuery, candidates, 'window.RECOMMENDATIONS_API_URL is not configured', candidateResult.source, collectedAnswers);
+      throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
     }
 
-    try {
-      console.info('[recommendations] requesting recommendation stage', {
-        url: endpoint,
-        query: cleanQuery,
-        candidateCount: candidates.length,
-        criteria: criteria,
-        answers: collectedAnswers
-      });
+    console.info('[AI] request start', {
+      url: endpoint,
+      query: context.query,
+      candidateCount: context.candidates.length,
+      criteria: context.criteria
+    });
 
-      var response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: cleanQuery, candidates: candidates, criteria: criteria, answers: collectedAnswers })
-      });
-      var payload = await response.json().catch(function () { return {}; });
-      if (!response.ok) throw new Error(payload.error || ('recommendations request failed: ' + response.status));
+    var response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: context.query,
+        candidates: context.candidates,
+        criteria: context.criteria,
+        answers: context.answers
+      })
+    });
+    var payload = await response.json().catch(function () { return {}; });
 
-      if (payload && payload.stage === 'collecting_requirements') {
-        console.info('[recommendations] requirements clarification requested', { count: (payload.questions || []).length });
-        return {
-          stage: 'collecting_requirements',
-          query: cleanQuery,
-          profile: payload.profile || {},
-          questions: Array.isArray(payload.questions) ? payload.questions : [],
-          products: [],
-          source: 'ai',
-          candidateSource: candidateResult.source,
-          error: null,
-          answers: collectedAnswers
-        };
-      }
+    console.info('[AI] response received', {
+      status: response.status,
+      stage: payload && payload.stage ? payload.stage : 'legacy'
+    });
 
-      var apiProducts = Array.isArray(payload)
-        ? payload
-        : (Array.isArray(payload && payload.products) ? payload.products : []);
-      var products = apiProducts.length ? apiProducts : candidates;
+    if (!response.ok) {
+      throw new Error(payload.error || ('recommendations request failed: ' + response.status));
+    }
 
-      console.info('[recommendations] recommendation request succeeded', { count: products.length });
+    if (payload && payload.stage === 'collecting_requirements') {
       return {
-        stage: 'recommend',
-        query: cleanQuery,
-        profile: payload && payload.profile ? payload.profile : criteria,
-        products: products,
-        source: payload && payload.source ? payload.source : 'ai',
-        candidateSource: candidateResult.source,
-        error: candidateResult.error || null,
-        answers: collectedAnswers
+        stage: 'collecting_requirements',
+        query: context.query,
+        profile: payload.profile || {},
+        questions: Array.isArray(payload.questions) ? payload.questions : [],
+        products: [],
+        source: 'ai',
+        candidateSource: context.candidateSource,
+        error: null,
+        answers: context.answers
       };
+    }
+
+    var apiProducts = Array.isArray(payload)
+      ? payload
+      : (Array.isArray(payload && payload.products) ? payload.products : []);
+
+    if (!apiProducts.length) {
+      throw new Error('AI response did not include recommended products');
+    }
+
+    return {
+      stage: 'recommend',
+      query: context.query,
+      profile: payload && payload.profile ? payload.profile : context.criteria,
+      products: apiProducts,
+      source: payload && payload.source ? payload.source : 'ai',
+      candidateSource: context.candidateSource,
+      error: null,
+      answers: context.answers
+    };
+  }
+
+  async function getRecommendations(query, answers) {
+    var context = await loadCandidateContext(query, answers);
+    try {
+      return await requestAiAnalysis(context);
     } catch (error) {
       var message = error && error.message ? error.message : String(error);
       console.error('[recommendations] request failed', { reason: message });
-      return fallbackRecommendation(cleanQuery, candidates, message, candidateResult.source, collectedAnswers);
+      return fallbackRecommendation(context, message);
     }
   }
 
   window.recommendationService = {
+    loadCandidateContext: loadCandidateContext,
+    requestAiAnalysis: requestAiAnalysis,
     getRecommendations: getRecommendations,
     config: { endpoint: endpoint }
   };

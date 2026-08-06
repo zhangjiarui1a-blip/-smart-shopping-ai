@@ -7,16 +7,14 @@ input.placeholder = '\u63cf\u8ff0\u4f60\u7684\u9700\u6c42\uff0cAI\u5e2e\u4f60\u5
 
 function beginRecommendation(source, query) {
   const cleanQuery = String(query || '').trim();
-  const clarification = window.clarificationService
-    ? window.clarificationService.evaluate(cleanQuery)
-    : { needClarification: false, questions: [], query: cleanQuery };
+  const clarification = window.recommendationFlow.decideEntry(cleanQuery);
   const entry = { source, query: cleanQuery, candidates: [] };
   window.sessionStorage.setItem('shoppingRecommendationEntry', JSON.stringify(entry));
   window.sessionStorage.setItem('shoppingClarificationDecision', JSON.stringify(clarification));
   console.info('[ENTRY] source=', entry.source);
   console.info('[ENTRY] query=', entry.query);
   console.info('[ENTRY] candidates length=', entry.candidates.length);
-  window.location.href = `${clarification.needClarification ? 'clarification.html' : 'result.html'}?q=${encodeURIComponent(entry.query)}`;
+  window.location.href = `${clarification.state === window.recommendationFlow.STATES.CLARIFY ? 'clarification.html' : 'result.html'}?q=${encodeURIComponent(entry.query)}`;
 }
 
 form.addEventListener('submit', event => {

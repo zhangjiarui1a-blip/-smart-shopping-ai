@@ -163,16 +163,7 @@
     scenario: savedClarification.usage || '',
     preference: savedClarification.priority || ''
   } : {};
-  var conversation = [{ role: 'user', text: query }];
   var activeLoadingTimer;
-  var stageRequestId = 0;
-  var requestInFlight = false;
-  var currentState = window.recommendationService.STATES.INPUT;
-
-  function transition(nextState, detail) {
-    currentState = nextState;
-    console.info('[RECOMMENDATION STATE]', currentState, detail || {});
-  }
 
   function showLoading(target, text) {
     window.clearInterval(activeLoadingTimer);
@@ -184,43 +175,6 @@
   function stopLoading(target) {
     window.clearInterval(activeLoadingTimer);
     target.setAttribute('aria-busy', 'false');
-  }
-
-  function renderConversation(result, target, reportTarget) {
-    reportTarget.hidden = true;
-    reportTarget.innerHTML = '';
-    var question = (result.questions || [])[0];
-    if (!question) {
-      target.innerHTML = renderAlert('error', '\u65e0\u6cd5\u83b7\u53d6\u9700\u6c42\u95ee\u9898', '\u8bf7\u8fd4\u56de\u9996\u9875\u91cd\u8bd5\u3002');
-      return;
-    }
-
-    var messages = conversation.map(function (message) {
-      return '<div class="clarification-message clarification-message--' + message.role + '"><span>' + (message.role === 'ai' ? 'NOVA AI' : '\u4f60') + '</span><p>' + escapeHtml(message.text) + '</p></div>';
-    }).join('');
-    var options = (question.options || []).map(function (option) {
-      return '<button type="button" class="clarification-option" data-answer="' + escapeHtml(option) + '">' + escapeHtml(option) + '</button>';
-    }).join('');
-
-    target.innerHTML = '<section class="clarification-chat"><div class="clarification-chat__heading"><p class="eyebrow">AI SHOPPING CONSULTATION</p><h3>\u5148\u8ba9\u6211\u4e86\u89e3\u4f60\u7684\u9700\u6c42</h3><p>\u8865\u5145\u5b8c\u4fe1\u606f\u540e\uff0c\u6211\u4f1a\u518d\u7ed3\u5408\u5546\u54c1\u5e93\u7ed9\u51fa\u63a8\u8350\u3002</p></div><div class="clarification-history">' + messages +
-      '<div class="clarification-message clarification-message--ai"><span>NOVA AI</span><p>' + escapeHtml(question.prompt) + '</p></div></div>' +
-      '<form id="clarificationForm" class="clarification-form"><label class="sr-only" for="clarificationInput">\u56de\u7b54 AI \u95ee\u9898</label><input id="clarificationInput" maxlength="80" autocomplete="off" placeholder="' + escapeHtml(question.placeholder || '\u8bf7\u8f93\u5165\u4f60\u7684\u56de\u7b54') + '"><button type="submit">\u7ee7\u7eed</button></form>' +
-      '<div class="clarification-options">' + options + '</div></section>';
-
-    var form = target.querySelector('#clarificationForm');
-    var input = target.querySelector('#clarificationInput');
-    function submitAnswer(value) {
-      var answer = String(value || '').trim();
-      if (!answer) { input.focus(); return; }
-      collectedAnswers[question.id] = answer;
-      conversation.push({ role: 'user', text: answer });
-      conversation.push({ role: 'ai', text: '\u6536\u5230\u4e86\uff0c\u8ba9\u6211\u7ee7\u7eed\u5e2e\u4f60\u5b8c\u5584\u9009\u8d2d\u6761\u4ef6\u3002' });
-      requestStage(target, reportTarget, '\u6b63\u5728\u5206\u6790\u4f60\u7684\u8865\u5145\u9700\u6c42');
-    }
-    form.addEventListener('submit', function (event) { event.preventDefault(); submitAnswer(input.value); });
-    target.querySelectorAll('[data-answer]').forEach(function (button) {
-      button.addEventListener('click', function () { submitAnswer(button.dataset.answer); });
-    });
   }
 
   function renderRecommendations(result, target, reportTarget) {
@@ -264,52 +218,42 @@
     console.warn('[FALLBACK]', { candidateCount: products.length, category: context.criteria && context.criteria.category });
   }
 
-  async function requestStage(target, reportTarget, loadingText) {
-    if (requestInFlight) return;
-    requestInFlight = true;
-    var requestId = ++stageRequestId;
-    transition(window.recommendationService.STATES.INPUT, { requestId: requestId });
-    showLoading(target, loadingText);
-    try {
-      var context = await window.recommendationService.loadCandidateContext(query, collectedAnswers);
-      if (requestId !== stageRequestId) return;
-
-      window.clearInterval(activeLoadingTimer);
-      target.setAttribute('aria-busy', 'true');
-      renderCandidateLoading(context, target, reportTarget);
-      transition(window.recommendationService.STATES.ANALYZING, { requestId: requestId, candidateCount: context.candidates.length });
-      console.info('[AI REQUEST]', { candidateCount: context.candidates.length, requestId: requestId });
-
-      await new Promise(function (resolve) { window.requestAnimationFrame(resolve); });
-      if (requestId !== stageRequestId) return;
-
-      var result = await window.recommendationService.requestAiAnalysis(context);
-      if (requestId !== stageRequestId) return;
-      console.info('[AI RESPONSE]', { stage: result.stage, requestId: requestId });
-      if (result.status === window.recommendationService.STATES.CLARIFY) {
-        transition(window.recommendationService.STATES.CLARIFY, { requestId: requestId });
-        renderConversation(result, target, reportTarget);
-      } else {
-        transition(window.recommendationService.STATES.SUCCESS, { requestId: requestId, productCount: result.products.length });
-        renderRecommendations(result, target, reportTarget);
-      }
-    } catch (error) {
-      if (requestId !== stageRequestId) return;
-      transition(window.recommendationService.STATES.FAILED, { requestId: requestId });
-      console.error('[AI RESPONSE]', { status: 'failed', reason: error && error.message ? error.message : String(error) });
-      if (typeof context !== 'undefined') renderAiFailure(context, target, reportTarget, error && error.message ? error.message : String(error));
-      else target.innerHTML = renderAlert('error', '\u63a8\u8350\u9875\u52a0\u8f7d\u5931\u8d25', '\u65e0\u6cd5\u52a0\u8f7d\u5546\u54c1\u5019\u9009\uff0c\u8bf7\u8fd4\u56de\u9996\u9875\u91cd\u8bd5\u3002');
-    } finally {
-      if (requestId === stageRequestId) stopLoading(target);
-      requestInFlight = false;
-    }
-  }
-
-  function render() {
+  async function render() {
     var target = document.querySelector('#recommendationResult');
     var reportTarget = document.querySelector('#decisionReport');
     document.querySelector('#querySummary').textContent = '\u4f60\u7684\u9700\u6c42\uff1a' + query;
-    requestStage(target, reportTarget);
+    var latestContext;
+    var result = await window.recommendationFlow.run({
+      query: query,
+      answers: collectedAnswers,
+      callbacks: {
+        onState: function (state) {
+          if (state === window.recommendationFlow.STATES.INPUT) showLoading(target);
+        },
+        onCandidates: function (context) {
+          latestContext = context;
+          window.clearInterval(activeLoadingTimer);
+          target.setAttribute('aria-busy', 'true');
+          renderCandidateLoading(context, target, reportTarget);
+        }
+      }
+    });
+
+    stopLoading(target);
+    if (result.state === window.recommendationFlow.STATES.SUCCESS) {
+      renderRecommendations(result, target, reportTarget);
+      return;
+    }
+    if (result.state === window.recommendationFlow.STATES.FALLBACK) {
+      renderRecommendations({
+        products: result.products || [],
+        source: 'fallback',
+        candidateSource: result.context && result.context.candidateSource,
+        profile: result.context && result.context.criteria
+      }, target, reportTarget);
+      return;
+    }
+    renderAiFailure(result.context || latestContext || { candidates: [], criteria: {} }, target, reportTarget, result.error && result.error.message);
   }
 
   render();

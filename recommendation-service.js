@@ -2,178 +2,51 @@
   'use strict';
 
   var endpoint = String(window.RECOMMENDATIONS_API_URL || '').trim();
-  var STATES = {
-    INPUT: 'INPUT',
-    CLARIFY: 'CLARIFY',
-    ANALYZING: 'ANALYZING',
-    SUCCESS: 'SUCCESS',
-    FAILED: 'FAILED'
-  };
 
-  function withState(status, data) {
-    data.status = status;
-    return data;
-  }
-
-  function extractBudget(query) {
-    var text = String(query || '');
-    var match = text.match(/(?:\u9884\u7b97|\u4e0d\u8d85\u8fc7|\u4ee5\u5185|\u5143\u5185)[^0-9]{0,8}(\d{3,7})/) || text.match(/(\d{3,7})\s*\u5143/);
-    return match ? Number(match[1]) : null;
-  }
-
-  function priceNumber(value) {
-    var digits = String(value == null ? '' : value).replace(/[^0-9.]/g, '');
-    return digits ? Number(digits) : null;
-  }
-
-  function applyBudget(candidates, budget) {
-    if (!budget) return candidates;
-    var withinBudget = candidates.filter(function (candidate) {
-      var price = priceNumber(candidate.price);
-      return price === null || price <= budget;
-    });
-    return withinBudget.length ? withinBudget : candidates;
-  }
-
-  function answerText(answers) {
-    return Object.keys(answers || {}).map(function (key) { return answers[key]; }).join(' ');
-  }
-
-  function readEntry(query) {
-    try {
-      var saved = JSON.parse(window.sessionStorage.getItem('shoppingRecommendationEntry') || 'null');
-      if (saved && saved.query === query && Array.isArray(saved.candidates)) return saved;
-    } catch (error) {
-      console.warn('[ENTRY] unable to read saved entry', error);
-    }
-    return { source: 'search', query: query, candidates: [] };
-  }
-
-  function emptyRecommendation(context) {
-    return withState(STATES.SUCCESS, {
-      stage: 'recommend',
-      query: context.query,
-      profile: context.criteria,
-      products: [],
-      source: 'empty',
-      candidateSource: context.candidateSource,
-      error: null,
-      answers: context.answers
-    });
-  }
-
-  async function loadCandidateContext(query, answers) {
-    var cleanQuery = String(query || '').trim();
-    var collectedAnswers = answers && typeof answers === 'object' ? answers : {};
-    var entry = readEntry(cleanQuery);
-
-    if (!window.productService || typeof window.productService.getCandidates !== 'function') {
-      throw new Error('product-service.js did not load before recommendation-service.js');
-    }
-
-    var candidateQuery = (cleanQuery + ' ' + answerText(collectedAnswers)).trim();
-    var candidateResult = await window.productService.getCandidates(candidateQuery);
-    var budget = extractBudget(candidateQuery);
-    var category = typeof window.productService.categoryFor === 'function'
-      ? window.productService.categoryFor(candidateQuery)
-      : '';
-
-    var candidates = applyBudget(candidateResult.products || [], budget).slice(0, 10);
-    console.info('[recommendation] user query:', cleanQuery);
-    console.info('[recommendation] detected category:', category || 'unclassified');
-    console.info('[recommendation] candidates before filter:', Number(candidateResult.beforeFilter) || 0);
-    console.info('[recommendation] candidates after filter:', candidates.length);
-    console.info('[ENTRY] source=', entry.source);
-    console.info('[ENTRY] query=', cleanQuery);
-    console.info('[ENTRY] candidates length=', candidates.length);
-
-    return withState(STATES.INPUT, {
-      query: cleanQuery,
-      entry: { source: entry.source, query: cleanQuery, candidates: candidates },
-      answers: collectedAnswers,
-      candidates: candidates,
-      criteria: { budget: budget, category: category },
-      candidateSource: candidateResult.source,
-      candidateError: candidateResult.error || null
-    });
-  }
-
-  async function requestAiAnalysis(context) {
-    if (!context.candidates.length) {
-      console.warn('[FALLBACK]', { query: context.query, reason: 'No matching products after category filter' });
-      return emptyRecommendation(context);
-    }
-
-    if (!endpoint) {
-      throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
-    }
+  async function request(payload) {
+    if (!endpoint) throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
 
     console.info('[AI REQUEST]', {
       url: endpoint,
-      query: context.query,
-      candidateCount: context.candidates.length,
-      criteria: context.criteria
+      query: payload.query,
+      candidateCount: Array.isArray(payload.candidates) ? payload.candidates.length : 0
     });
 
-    var response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: context.query,
-        candidates: context.candidates,
-        criteria: context.criteria,
-        answers: context.answers
-      })
-    });
-    var payload = await response.json().catch(function () { return {}; });
-
-    console.info('[AI RESPONSE]', {
-      status: response.status,
-      stage: payload && payload.stage ? payload.stage : 'legacy'
-    });
-
-    if (!response.ok) {
-      throw new Error(payload.error || ('recommendations request failed: ' + response.status));
-    }
-
-    if (payload && payload.stage === 'collecting_requirements') {
-      return withState(STATES.CLARIFY, {
-        stage: 'collecting_requirements',
-        query: context.query,
-        profile: payload.profile || {},
-        questions: Array.isArray(payload.questions) ? payload.questions : [],
-        products: [],
-        source: 'ai',
-        candidateSource: context.candidateSource,
-        error: null,
-        answers: context.answers
+    var response;
+    try {
+      response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+    } catch (error) {
+      error.code = error.code || 'NETWORK_ERROR';
+      throw error;
     }
 
-    var apiProducts = Array.isArray(payload)
-      ? payload
-      : (Array.isArray(payload && payload.products) ? payload.products : []);
-
-    if (!apiProducts.length) {
-      throw new Error('AI response did not include recommended products');
+    var text = await response.text();
+    var data;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (error) {
+      var parseError = new Error('recommendations response is not valid JSON');
+      parseError.code = 'INVALID_RESPONSE';
+      throw parseError;
     }
 
-    return withState(STATES.SUCCESS, {
-      stage: 'recommend',
-      query: context.query,
-      profile: payload && payload.profile ? payload.profile : context.criteria,
-      products: apiProducts,
-      source: payload && payload.source ? payload.source : 'ai',
-      candidateSource: context.candidateSource,
-      error: null,
-      answers: context.answers
-    });
+    console.info('[AI RESPONSE]', { status: response.status, fallback: data.fallback === true });
+    if (!response.ok) {
+      var requestError = new Error(data.error || ('recommendations request failed: ' + response.status));
+      requestError.code = 'HTTP_ERROR';
+      requestError.status = response.status;
+      throw requestError;
+    }
+
+    return data;
   }
 
   window.recommendationService = {
-    STATES: STATES,
-    loadCandidateContext: loadCandidateContext,
-    requestAiAnalysis: requestAiAnalysis,
+    request: request,
     config: { endpoint: endpoint }
   };
 }());

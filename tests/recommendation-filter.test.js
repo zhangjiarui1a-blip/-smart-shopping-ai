@@ -11,20 +11,26 @@ const window = {
     getItem: key => storage.get(key) || null,
     setItem: (key, value) => storage.set(key, value)
   },
-  RECOMMENDATIONS_API_URL: 'https://example.test/recommendations'
+  RECOMMENDATIONS_API_URL: 'https://example.test/recommendations',
+  PRODUCTS_API_URL: ''
 };
+let responsePayload = { stage: 'recommend', products: [] };
 let aiRequestCount = 0;
 const context = {
   window,
   console: silentConsole,
   fetch: async () => {
     aiRequestCount += 1;
-    throw new Error('AI must not run for an empty candidate list');
+    return {
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify(responsePayload)
+    };
   }
 };
 
 vm.createContext(context);
-['product-database.js', 'product-service.js', 'recommendation-service.js'].forEach(file => {
+['clarification-service.js', 'product-database.js', 'product-service.js', 'recommendation-service.js', 'recommendation-flow.js'].forEach(file => {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 });
 
@@ -32,27 +38,27 @@ async function run() {
   const snack = await window.productService.getCandidates('\u63a8\u8350\u96f6\u98df');
   assert.ok(snack.products.length > 0, 'snack query should have products');
   assert.ok(snack.products.every(product => product.category === '\u98df\u54c1'), 'snack query must only return food products');
-  assert.ok(snack.products.every(product => !['\u624b\u673a', '\u7535\u8111', '\u6570\u7801', '\u5ba0\u7269\u7528\u54c1'].includes(product.category)), 'snack query must not return unrelated categories');
 
   const dogFood = await window.productService.getCandidates('\u63a8\u8350\u72d7\u7cae');
   assert.ok(dogFood.products.length > 0, 'dog-food query should have products');
   assert.ok(dogFood.products.every(product => product.category === '\u5ba0\u7269\u7528\u54c1'), 'dog-food query must only return pet products');
 
-  const prepared = await window.recommendationService.loadCandidateContext('\u63a8\u8350\u96f6\u98df', {});
-  assert.equal(prepared.status, window.recommendationService.STATES.INPUT, 'candidate preparation must begin in INPUT state');
+  const computer = window.recommendationFlow.decideEntry('\u4e70\u7535\u8111');
+  assert.equal(computer.state, window.recommendationFlow.STATES.CLARIFY, 'incomplete computer query must enter clarification');
 
-  const empty = await window.recommendationService.requestAiAnalysis({
-    query: '\u4e0d\u5b58\u5728\u7684\u5546\u54c1\u7c7b\u522b',
-    candidates: [],
-    criteria: { category: '' },
-    candidateSource: 'fallback',
-    answers: {}
-  });
-  assert.equal(empty.source, 'empty', 'empty candidates should skip AI and return an empty recommendation');
-  assert.equal(empty.status, window.recommendationService.STATES.SUCCESS, 'empty candidates are a handled result, not an AI failure');
-  assert.equal(aiRequestCount, 0, 'AI must not be called without filtered candidates');
+  responsePayload = { fallback: true, message: 'AI\u6682\u65f6\u7e41\u5fd9', products: [] };
+  const timeoutResult = await window.recommendationFlow.run({ query: '\u63a8\u8350\u96f6\u98df', answers: {} });
+  assert.equal(timeoutResult.state, window.recommendationFlow.STATES.FALLBACK, 'AI timeout payload must map to FALLBACK');
+  assert.ok(timeoutResult.products.length > 0, 'fallback must preserve filtered candidates');
+  assert.ok(timeoutResult.products.every(product => product.category === '\u98df\u54c1'), 'fallback must preserve category safety');
+  assert.equal(aiRequestCount, 1, 'one flow run must make exactly one AI request');
 
-  console.log('recommendation filtering tests passed');
+  responsePayload = { stage: 'recommend', products: snack.products.slice(0, 2) };
+  const successResult = await window.recommendationFlow.run({ query: '\u63a8\u8350\u96f6\u98df', answers: {} });
+  assert.equal(successResult.state, window.recommendationFlow.STATES.SUCCESS, 'valid AI payload must map to SUCCESS');
+  assert.equal(aiRequestCount, 2, 'each flow run must make only one AI request');
+
+  console.log('V0.3 recommendation architecture tests passed');
 }
 
 run().catch(error => {

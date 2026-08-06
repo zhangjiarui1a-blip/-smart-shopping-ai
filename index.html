@@ -3,61 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Nova AI &#x2014; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x7A7A;&#x95F4;" />
-    <title>Nova AI &#x2014; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x7A7A;&#x95F4;</title>
+    <meta name="description" content="Nova AI &#x2014; AI &#x9A71;&#x52A8;&#x7684;&#x667A;&#x80FD;&#x8D2D;&#x7269;&#x7A7A;&#x95F4;" />
+    <title>Nova AI &#x2014; AI &#x667A;&#x80FD;&#x8D2D;&#x7269;&#x7A7A;&#x95F4;</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link rel="stylesheet" href="./category.css" />
     <link rel="stylesheet" href="./home.css" />
   </head>
   <body class="home-page">
     <main class="nova-home">
-      <div class="home-glow home-glow--one" aria-hidden="true"></div>
-      <div class="home-glow home-glow--two" aria-hidden="true"></div>
-      <div class="home-grid" aria-hidden="true"></div>
-
       <header class="home-header" id="top">
-        <a class="home-brand" href="#top" aria-label="Nova AI &#x9996;&#x9875;"><span class="home-brand__mark">N</span><span>Nova AI</span></a>
-        <div class="home-status"><i></i><span>DECISION SPACE ONLINE</span></div>
+        <a class="home-brand" href="#top" aria-label="Nova AI &#x9996;&#x9875;"><span class="home-brand__mark">N</span><span>Nova AI</span><small>AI &#x8D2D;&#x7269;</small></a>
+        <p class="home-status"><i></i><span>&#x667A;&#x80FD;&#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x7A7A;&#x95F4;</span></p>
       </header>
 
-      <section class="future-hero" aria-labelledby="page-title">
-        <div class="hero-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-        <p class="home-kicker">THE FUTURE OF SHOPPING DECISIONS</p>
-        <h1 id="page-title">AI&#x667A;&#x80FD;&#x8D2D;&#x7269;&#x52A9;&#x624B;</h1>
-        <p class="home-intro">不止发现商品。Nova AI 理解你的需求、预算与偏好，帮你找到更值得做出的选择。</p>
-
-        <section class="chat-card command-dock" aria-labelledby="chat-title">
-          <div class="dock-head"><div class="dock-signal"><span></span><span></span><span></span></div><div><p>NOVA CORE</p><h2 id="chat-title">现在，想探索什么？</h2></div><small>AI READY</small></div>
-          <form id="assistantForm" class="chat-form">
-            <label class="sr-only" for="recommendationInput">&#x8D2D;&#x7269;&#x9700;&#x6C42;</label>
-            <input id="recommendationInput" name="query" maxlength="160" placeholder="&#x63CF;&#x8FF0;&#x4F60;&#x7684;&#x9700;&#x6C42;&#xFF0C;AI&#x5E2E;&#x4F60;&#x505A;&#x9009;&#x62E9;" autocomplete="off" />
-            <button id="recommendButton" type="submit" aria-label="&#x5F00;&#x59CB; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;"><span>&#x5F00;&#x59CB;&#x63A2;&#x7D22;</span><b aria-hidden="true">&#x2197;</b></button>
-          </form>
-          <div class="quick-prompts" aria-label="&#x63A8;&#x8350;&#x7075;&#x611F;"><span>&#x5FEB;&#x901F;&#x63A2;&#x7D22;</span><button type="button" data-prompt="&#x63A8;&#x8350;&#x6570;&#x7801;">&#x6570;&#x7801;&#x88C5;&#x5907;</button><button type="button" data-prompt="&#x4E70;&#x7535;&#x8111;">&#x7535;&#x8111;&#x51B3;&#x7B56;</button><button type="button" data-prompt="&#x63A8;&#x8350;&#x96F6;&#x98DF;">&#x751F;&#x6D3B;&#x96F6;&#x98DF;</button><button type="button" data-prompt="&#x63A8;&#x8350;&#x793C;&#x7269;">&#x793C;&#x7269;&#x7075;&#x611F;</button></div>
-          <div id="recommendationResult" class="response" aria-live="polite" hidden></div>
-        </section>
+      <section class="campaign-strip" aria-label="&#x6D3B;&#x52A8;&#x4E13;&#x533A;">
+        <a href="channel.html?category=%E5%AE%B6%E7%94%A8%E7%94%B5%E5%99%A8" class="campaign-card campaign-card--subsidy"><span>&#x56FD;&#x8865;&#x4E13;&#x533A;</span><strong>&#x5BB6;&#x7535;&#x6362;&#x65B0;&#x6B63;&#x5F53;&#x65F6;</strong><em>&#x53BB;&#x770B;&#x770B; &#x2192;</em></a>
+        <a href="channel.html?category=%E6%95%B0%E7%A0%81%E7%A7%91%E6%8A%80" class="campaign-card"><span>&#x7279;&#x4EF7;&#x597D;&#x7269;</span><strong>&#x6BCF;&#x65E5;&#x7CBE;&#x9009;&#x4EF7;&#x503C;&#x4E4B;&#x9009;</strong><em>&#x4ECA;&#x65E5;&#x66F4;&#x65B0;</em></a>
+        <a href="channel.html?category=%E7%A9%BF%E6%90%AD%E6%9C%8D%E9%A5%B0" class="campaign-card"><span>&#x9650;&#x65F6;&#x6298;&#x6263;</span><strong>&#x590F;&#x65E5;&#x65B0;&#x54C1; 7 &#x6298;&#x8D77;</strong><em>&#x5269; 08:42:16</em></a>
+        <a href="#ai-space" class="campaign-card campaign-card--hot"><span>&#x70ED;&#x95E8;&#x6D3B;&#x52A8;</span><strong>AI &#x5E2E;&#x4F60;&#x7B5B;&#x51FA;&#x771F;&#x6B63;&#x503C;&#x5F97;</strong><em>&#x7ACB;&#x5373;&#x63A2;&#x7D22; &#x2192;</em></a>
       </section>
 
-      <section class="space-section" aria-labelledby="spaces-title">
-        <div class="section-lead"><p class="home-kicker">EXPLORE BY INTENT</p><h2 id="spaces-title">进入你的购物空间</h2><p>从一个方向开始，让 AI 帮你展开更清晰的选择。</p></div>
-        <nav class="categories space-gates" aria-label="&#x8D2D;&#x7269;&#x7A7A;&#x95F4;">
-          <a class="space-gate space-gate--digital" href="result.html?q=&#x6570;&#x7801;&#x4EA7;&#x54C1;&#x63A8;&#x8350;"><span class="gate-index">01</span><span class="gate-icon">&#x2726;</span><strong>&#x6570;&#x7801;&#x7A7A;&#x95F4;</strong><small>科技与效率</small></a>
-          <a class="space-gate space-gate--life" href="result.html?q=&#x5BB6;&#x5C45;&#x4EA7;&#x54C1;&#x63A8;&#x8350;"><span class="gate-index">02</span><span class="gate-icon">&#x25CE;</span><strong>&#x751F;&#x6D3B;&#x7A7A;&#x95F4;</strong><small>日常与舒适</small></a>
-          <a class="space-gate space-gate--trend" href="result.html?q=&#x624B;&#x673A;&#x63A8;&#x8350;"><span class="gate-index">03</span><span class="gate-icon">&#x25C7;</span><strong>&#x6F6E;&#x6D41;&#x7A7A;&#x95F4;</strong><small>风格与表达</small></a>
-          <a class="space-gate space-gate--gift" href="result.html?q=&#x793C;&#x7269;&#x63A8;&#x8350;"><span class="gate-index">04</span><span class="gate-icon">&#x2734;</span><strong>&#x793C;&#x7269;&#x7A7A;&#x95F4;</strong><small>心意与惊喜</small></a>
+      <section class="category-panel" aria-labelledby="category-title">
+        <div class="section-title-row"><div><p class="section-kicker">EXPLORE CHANNELS</p><h1 id="category-title">AI &#x8D2D;&#x7269;&#x7A7A;&#x95F4;</h1></div><p>&#x5C0A;&#x91CD;&#x6BCF;&#x4E2A;&#x4EBA;&#x7684;&#x9009;&#x62E9;&#xFF0C;&#x4ECE;&#x4E00;&#x4E2A;&#x9891;&#x9053;&#x5F00;&#x59CB;&#x901B;&#x8D77;&#x6765;&#x3002;</p></div>
+        <nav class="category-nav" aria-label="&#x8D2D;&#x7269;&#x5206;&#x7C7B;">
+          <a href="channel.html?category=%E6%95%B0%E7%A0%81%E7%A7%91%E6%8A%80;"><b>&#x2726;</b><span>&#x6570;&#x7801;&#x79D1;&#x6280;</span><small>&#x624B;&#x673A; / &#x7535;&#x8111; / &#x8033;&#x673A;</small></a>
+          <a href="channel.html?category=%E7%A9%BF%E6%90%AD%E6%9C%8D%E9%A5%B0;"><b>&#x25C7;</b><span>&#x7A7F;&#x642D;&#x670D;&#x9970;</span><small>&#x7537;&#x88C5; / &#x5973;&#x88C5; / &#x978B;&#x9774;</small></a>
+          <a href="channel.html?category=%E7%BE%8E%E9%A3%9F%E9%A5%AE%E5%93%81;"><b>&#x25CB;</b><span>&#x7F8E;&#x98DF;&#x996E;&#x54C1;</span><small>&#x96F6;&#x98DF; / &#x996E;&#x54C1; / &#x751F;&#x9C9C;</small></a>
+          <a href="channel.html?category=%E7%BE%8E%E5%A6%86%E6%8A%A4%E8%82%A4;"><b>&#x2731;</b><span>&#x7F8E;&#x5986;&#x62A4;&#x80A4;</span><small>&#x62A4;&#x80A4; / &#x5F69;&#x5986; / &#x9999;&#x6C1B;</small></a>
+          <a href="channel.html?category=%E9%A5%B0%E5%93%81%E9%85%8D%E4%BB%B6;"><b>&#x2727;</b><span>&#x9970;&#x54C1;&#x914D;&#x4EF6;</span><small>&#x624B;&#x8868; / &#x5305;&#x888B; / &#x914D;&#x9970;</small></a>
+          <a href="channel.html?category=%E6%BD%AE%E7%8E%A9%E6%94%B6%E8%97%8F;"><b>&#x2605;</b><span>&#x6F6E;&#x73A9;&#x6536;&#x85CF;</span><small>&#x624B;&#x529E; / &#x76F2;&#x76D2; / &#x6A21;&#x578B;</small></a>
+          <a href="channel.html?category=%E5%AE%B6%E7%94%A8%E7%94%B5%E5%99%A8;"><b>&#x25C8;</b><span>&#x5BB6;&#x7528;&#x7535;&#x5668;</span><small>&#x6E05;&#x6D01; / &#x53A8;&#x623F; / &#x5F71;&#x97F3;</small></a>
+          <a href="channel.html?category=%E5%AE%B6%E5%B1%85%E7%94%9F%E6%B4%BB;"><b>&#x2302;</b><span>&#x5BB6;&#x5C45;&#x751F;&#x6D3B;</span><small>&#x6536;&#x7EB3; / &#x7761;&#x7720; / &#x6E05;&#x6D01;</small></a>
+          <a href="channel.html?category=%E6%AF%8D%E5%A9%B4%E7%94%A8%E5%93%81;"><b>&#x2661;</b><span>&#x6BCD;&#x5A74;&#x7528;&#x54C1;</span><small>&#x5582;&#x517B; / &#x6D17;&#x62A4; / &#x51FA;&#x884C;</small></a>
+          <a href="channel.html?category=%E8%BF%90%E5%8A%A8%E6%88%B7%E5%A4%96;"><b>&#x25B3;</b><span>&#x8FD0;&#x52A8;&#x6237;&#x5916;</span><small>&#x8DD1;&#x6B65; / &#x9732;&#x8425; / &#x9A91;&#x884C;</small></a>
+          <a href="channel.html?category=%E7%A4%BC%E7%89%A9%E7%B2%BE%E9%80%89;"><b>&#x273F;</b><span>&#x793C;&#x7269;&#x7CBE;&#x9009;</span><small>&#x751F;&#x65E5; / &#x7EAA;&#x5FF5; / &#x5FC3;&#x610F;</small></a>
         </nav>
       </section>
 
-      <section class="discover-section" aria-labelledby="discover-title">
-        <div class="section-lead"><p class="home-kicker">NOVA SIGNALS</p><h2 id="discover-title">今日 AI 发现</h2></div>
-        <div class="discover-grid">
-          <a class="discover-card discover-card--feature" data-recommendation-query="&#x901A;&#x52E4;&#x529E;&#x516C;&#xFF0C;&#x9884;&#x7B97;5000&#x5143;&#xFF0C;&#x63A8;&#x8350;&#x8F7B;&#x8584;&#x7535;&#x8111;" href="result.html?q=&#x901A;&#x52E4;&#x529E;&#x516C;&#xFF0C;&#x9884;&#x7B97;5000&#x5143;&#xFF0C;&#x63A8;&#x8350;&#x8F7B;&#x8584;&#x7535;&#x8111;"><p>SMART SCENARIO / 01</p><h3>为通勤生活<br />构建轻盈装备</h3><span>轻薄电脑 · 降噪耳机 · 长续航</span><em>探索方案 <b>→</b></em></a>
-          <a class="discover-card" data-recommendation-query="&#x9884;&#x7B97;3000&#x5143;&#xFF0C;&#x65E5;&#x5E38;&#x4F7F;&#x7528;&#xFF0C;&#x6CE8;&#x91CD;&#x6027;&#x4EF7;&#x6BD4;&#xFF0C;&#x63A8;&#x8350;&#x624B;&#x673A;" href="result.html?q=&#x9884;&#x7B97;3000&#x5143;&#xFF0C;&#x65E5;&#x5E38;&#x4F7F;&#x7528;&#xFF0C;&#x6CE8;&#x91CD;&#x6027;&#x4EF7;&#x6BD4;&#xFF0C;&#x63A8;&#x8350;&#x624B;&#x673A;"><span class="discover-number">02</span><p>热门购物方案</p><h3>预算内的性能平衡</h3><small>从需求出发，而不是参数堆叠。</small></a>
-          <a class="discover-card" data-recommendation-query="&#x9001;&#x751F;&#x65E5;&#x793C;&#x7269;&#xFF0C;&#x9884;&#x7B97;500&#x5143;&#xFF0C;&#x6CE8;&#x91CD;&#x5FC3;&#x610F;" href="result.html?q=&#x9001;&#x751F;&#x65E5;&#x793C;&#x7269;&#xFF0C;&#x9884;&#x7B97;500&#x5143;&#xFF0C;&#x6CE8;&#x91CD;&#x5FC3;&#x610F;"><span class="discover-number">03</span><p>智能推荐空间</p><h3>让选择更有把握</h3><small>结合预算、场景与偏好，得到可解释的建议。</small></a>
+      <section class="ai-space" id="ai-space" aria-labelledby="ai-space-title">
+        <div class="ai-space-copy"><p class="section-kicker">NOVA AI CURATION</p><h2 id="ai-space-title">&#x4E0D;&#x53EA;&#x662F;&#x641C;&#x7D22;&#xFF0C;&#x662F;&#x66F4;&#x61C2;&#x4F60;&#x7684;&#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x3002;</h2><p>AI &#x4F1A;&#x7ED3;&#x5408;&#x9884;&#x7B97;&#x3001;&#x573A;&#x666F;&#x548C;&#x504F;&#x597D;&#xFF0C;&#x4ECE;&#x53EF;&#x9009;&#x5546;&#x54C1;&#x4E2D;&#x4E3A;&#x4F60;&#x627E;&#x5230;&#x6700;&#x5408;&#x9002;&#x7684;&#x90A3;&#x51E0;&#x4E2A;&#x3002;</p>
+          <form id="assistantForm" class="chat-form">
+            <label class="sr-only" for="recommendationInput">&#x8D2D;&#x7269;&#x9700;&#x6C42;</label>
+            <input id="recommendationInput" name="query" maxlength="160" placeholder="&#x63CF;&#x8FF0;&#x4F60;&#x7684;&#x9700;&#x6C42;&#xFF0C;AI&#x5E2E;&#x4F60;&#x505A;&#x9009;&#x62E9;" autocomplete="off" />
+            <button id="recommendButton" type="submit"><span>AI &#x5E2E;&#x6211;&#x9009;</span><b aria-hidden="true">&#x2197;</b></button>
+          </form>
+          <div class="quick-prompts" aria-label="&#x5FEB;&#x901F;&#x63A8;&#x8350;"><button type="button" data-prompt="5000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x6E38;&#x620F;&#x7535;&#x8111;">&#x6E38;&#x620F;&#x7535;&#x8111;</button><button type="button" data-prompt="&#x767E;&#x5143;&#x96F6;&#x98DF;&#x63A8;&#x8350;">&#x767E;&#x5143;&#x96F6;&#x98DF;</button><button type="button" data-prompt="&#x65B0;&#x624B;&#x6444;&#x5F71;&#x88C5;&#x5907;">&#x65B0;&#x624B;&#x6444;&#x5F71;</button></div>
+          <div id="recommendationResult" class="response" aria-live="polite" hidden></div>
+        </div>
+        <div class="ai-space-visual" aria-hidden="true"><div class="visual-orb"></div><div class="visual-product visual-product--phone"></div><div class="visual-product visual-product--headphones"></div><span>AI CURATED</span></div>
+      </section>
+
+      <section class="discovery-section" aria-labelledby="discover-title">
+        <div class="section-title-row"><div><p class="section-kicker">SHOPPING IDEAS</p><h2 id="discover-title">&#x4ECA;&#x65E5; AI &#x53D1;&#x73B0;</h2></div><a href="#product-feed">&#x66F4;&#x591A;&#x597D;&#x7269; &#x2192;</a></div>
+        <div class="discovery-grid">
+          <a data-recommendation-query="5000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x529E;&#x516C;&#x548C;&#x6E38;&#x620F;&#x517C;&#x987E;&#x7684;&#x7535;&#x8111;" href="result.html?q=5000%E5%85%83%E9%A2%84%E7%AE%97%E5%8A%9E%E5%85%AC%E5%92%8C%E6%B8%B8%E6%88%8F%E5%85%BC%E9%A1%BE%E7%9A%84%E7%94%B5%E8%84%91" class="idea-card idea-card--computer"><span>01 / &#x7535;&#x8111;&#x51B3;&#x7B56;</span><h3>5000 &#x5143;&#x7535;&#x8111;<br />&#x600E;&#x4E48;&#x9009;&#xFF1F;</h3><p>&#x529E;&#x516C;&#x3001;&#x5B66;&#x4E60;&#x4E0E;&#x6E38;&#x620F;&#x7684;&#x5E73;&#x8861;&#x7B54;&#x6848;</p></a>
+          <a data-recommendation-query="&#x590F;&#x5B63;&#x65E5;&#x5E38;&#x7A7F;&#x642D;&#x63A8;&#x8350;" href="result.html?q=%E5%A4%8F%E5%AD%A3%E6%97%A5%E5%B8%B8%E7%A9%BF%E6%90%AD%E6%8E%A8%E8%8D%90" class="idea-card idea-card--style"><span>02 / &#x7A7F;&#x642D;&#x7075;&#x611F;</span><h3>&#x590F;&#x5B63;&#x7A7F;&#x642D;<br />&#x8F7B;&#x677E;&#x6709;&#x578B;</h3><p>&#x4ECE;&#x901A;&#x52E4;&#x5230;&#x5468;&#x672B;&#x7684;&#x6E05;&#x723D;&#x9009;&#x62E9;</p></a>
+          <a data-recommendation-query="100&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x65E5;&#x5E38;&#x96F6;&#x98DF;&#x63A8;&#x8350;" href="result.html?q=100%E5%85%83%E9%A2%84%E7%AE%97%E6%97%A5%E5%B8%B8%E9%9B%B6%E9%A3%9F%E6%8E%A8%E8%8D%90" class="idea-card idea-card--food"><span>03 / &#x7F8E;&#x98DF;&#x6E05;&#x5355;</span><h3>&#x767E;&#x5143;&#x96F6;&#x98DF;<br />&#x7CBE;&#x9009;&#x7EC4;&#x5408;</h3><p>&#x8FFD;&#x5267;&#x3001;&#x901A;&#x52E4;&#x3001;&#x529E;&#x516C;&#x5BA4;&#x7684;&#x53CB;&#x597D;&#x8865;&#x7ED9;</p></a>
+          <a data-recommendation-query="5000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x65B0;&#x624B;&#x6444;&#x5F71;&#x88C5;&#x5907;" href="result.html?q=5000%E5%85%83%E9%A2%84%E7%AE%97%E6%96%B0%E6%89%8B%E6%91%84%E5%BD%B1%E8%A3%85%E5%A4%87" class="idea-card idea-card--camera"><span>04 / &#x5F71;&#x50CF;&#x8BBE;&#x5907;</span><h3>&#x65B0;&#x624B;&#x6444;&#x5F71;<br />&#x4E00;&#x6B21;&#x914D;&#x9F50;</h3><p>&#x4ECE;&#x76F8;&#x673A;&#x5230;&#x914D;&#x4EF6;&#x7684;&#x5165;&#x95E8;&#x65B9;&#x6848;</p></a>
         </div>
       </section>
 
-      <footer class="home-footer"><span>© NOVA AI</span><span>SHOP WITH CLARITY</span></footer>
+      <section class="product-feed" id="product-feed" aria-labelledby="feed-title">
+        <div class="section-title-row"><div><p class="section-kicker">NOVA PICKS</p><h2 id="feed-title">&#x4E3A;&#x4F60;&#x53D1;&#x73B0;&#x503C;&#x5F97;&#x7684;&#x597D;&#x7269;</h2></div><p>AI &#x7CBE;&#x9009;&#x6D41;</p></div>
+        <div class="feed-grid">
+          <a class="feed-card" data-recommendation-query="3000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x65E5;&#x5E38;&#x4F7F;&#x7528;&#x7684;&#x624B;&#x673A;" href="result.html?q=3000%E5%85%83%E9%A2%84%E7%AE%97%E6%97%A5%E5%B8%B8%E4%BD%BF%E7%94%A8%E7%9A%84%E6%89%8B%E6%9C%BA"><div class="feed-image feed-image--phone"></div><span>AI &#x7CBE;&#x9009;</span><h3>Nova X Pro &#x667A;&#x80FD;&#x624B;&#x673A;</h3><strong>&#xA5;2,999</strong><small>&#x9002;&#x5408;&#x65E5;&#x5E38;&#x4E0E;&#x5F71;&#x50CF;&#x8BB0;&#x5F55;</small></a>
+          <a class="feed-card" data-recommendation-query="5000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x901A;&#x52E4;&#x8F7B;&#x8584;&#x7535;&#x8111;" href="result.html?q=5000%E5%85%83%E9%A2%84%E7%AE%97%E9%80%9A%E5%8B%A4%E8%BD%BB%E8%96%84%E7%94%B5%E8%84%91"><div class="feed-image feed-image--laptop"></div><span>&#x9AD8;&#x6027;&#x4EF7;&#x6BD4;</span><h3>AirBook 14 &#x8F7B;&#x8584;&#x672C;</h3><strong>&#xA5;4,699</strong><small>&#x901A;&#x52E4;&#x529E;&#x516C;&#x7684;&#x8F7B;&#x76C8;&#x9009;&#x62E9;</small></a>
+          <a class="feed-card" data-recommendation-query="1000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x964D;&#x566A;&#x8033;&#x673A;&#x63A8;&#x8350;" href="result.html?q=1000%E5%85%83%E9%A2%84%E7%AE%97%E9%99%8D%E5%99%AA%E8%80%B3%E6%9C%BA%E6%8E%A8%E8%8D%90"><div class="feed-image feed-image--headphones"></div><span>&#x901A;&#x52E4;&#x5FC5;&#x5907;</span><h3>Quiet Sound &#x964D;&#x566A;&#x8033;&#x673A;</h3><strong>&#xA5;899</strong><small>&#x4E13;&#x6CE8;&#x6C89;&#x6D78;&#x7684;&#x807D;&#x611F;</small></a>
+          <a class="feed-card" data-recommendation-query="1000&#x5143;&#x9884;&#x7B97;&#xFF0C;&#x9001;&#x751F;&#x65E5;&#x793C;&#x7269;&#x63A8;&#x8350;" href="result.html?q=1000%E5%85%83%E9%A2%84%E7%AE%97%E9%80%81%E7%94%9F%E6%97%A5%E7%A4%BC%E7%89%A9%E6%8E%A8%E8%8D%90"><div class="feed-image feed-image--watch"></div><span>&#x793C;&#x7269;&#x7CBE;&#x9009;</span><h3>Classic &#x667A;&#x80FD;&#x624B;&#x8868;</h3><strong>&#xA5;999</strong><small>&#x9002;&#x5408;&#x91CD;&#x8981;&#x65F6;&#x523B;&#x7684;&#x5FC3;&#x610F;</small></a>
+        </div>
+      </section>
+
+      <footer class="home-footer"><span>&#xA9; NOVA AI</span><span>SHOP WITH CLARITY</span></footer>
     </main>
     <script src="./clarification-service.js"></script>
     <script src="./recommendation-flow.js"></script>

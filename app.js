@@ -35,14 +35,6 @@ document.querySelectorAll('[data-prompt]').forEach(chip => {
   });
 });
 
-document.querySelectorAll('.categories a').forEach(link => {
-  link.addEventListener('click', event => {
-    event.preventDefault();
-    const query = new URL(link.href).searchParams.get('q') || link.textContent.trim();
-    beginRecommendation('category', query);
-  });
-});
-
 document.querySelectorAll('[data-recommendation-query]').forEach(link => {
   link.addEventListener('click', event => {
     event.preventDefault();

@@ -85,6 +85,18 @@
         { key: 'need', label: '\u9700\u6c42', options: ['\u8f7b\u91cf', '\u4e13\u4e1a', '\u5165\u95e8', '\u9ad8\u5f3a\u5ea6'] },
         { key: 'budget', label: '\u4ef7\u683c', options: ['300\u4ee5\u4e0b', '300-1000', '1000+'] }
       ]
+    },
+    makeup: {
+      label: '\u7f8e\u5986\u62a4\u80a4', terms: ['\u7f8e\u5986', '\u62a4\u80a4', '\u5f69\u5986', '\u9999\u6c1b'],
+      groups: [{ key: 'type', label: '\u54c1\u7c7b', options: ['\u6d01\u9762', '\u8865\u6c34', '\u5f69\u5986', '\u9999\u6c1b'] }, { key: 'need', label: '\u9700\u6c42', options: ['\u6e05\u723d', '\u4fdd\u6e7f', '\u901a\u52e4', '\u9001\u793c'] }, { key: 'budget', label: '\u4ef7\u683c', options: ['300\u4ee5\u4e0b', '300-1000', '1000+'] }]
+    },
+    accessory: {
+      label: '\u9970\u54c1\u914d\u4ef6', terms: ['\u9970\u54c1', '\u914d\u4ef6', '\u624b\u8868', '\u9879\u94fe', '\u6212\u6307'],
+      groups: [{ key: 'type', label: '\u54c1\u7c7b', options: ['\u624b\u8868', '\u9879\u94fe', '\u6212\u6307', '\u5305\u888b'] }, { key: 'style', label: '\u98ce\u683c', options: ['\u7b80\u7ea6', '\u901a\u52e4', '\u6f6e\u6d41', '\u793c\u7269'] }, { key: 'budget', label: '\u4ef7\u683c', options: ['300\u4ee5\u4e0b', '300-1000', '1000+'] }]
+    },
+    gift: {
+      label: '\u793c\u7269\u7cbe\u9009', terms: ['\u793c\u7269', '\u9001\u4eba', '\u751f\u65e5', '\u7eaa\u5ff5'],
+      groups: [{ key: 'type', label: '\u573a\u5408', options: ['\u751f\u65e5', '\u7eaa\u5ff5\u65e5', '\u8c22\u793c', '\u63a2\u671b'] }, { key: 'need', label: '\u6c14\u6c1b', options: ['\u5fc3\u610f', '\u5b9e\u7528', '\u4eea\u5f0f\u611f', '\u9ad8\u7ea7\u611f'] }, { key: 'budget', label: '\u4ef7\u683c', options: ['300\u4ee5\u4e0b', '300-1000', '1000+'] }]
     }
   };
 
@@ -98,6 +110,7 @@
     '\u6bcd\u5a74\u7528\u54c1': 'baby',
     '\u5ba0\u7269\u7528\u54c1': 'pet',
     '\u8fd0\u52a8\u6237\u5916': 'sports'
+    , '\u7f8e\u5986\u62a4\u80a4': 'makeup', '\u9970\u54c1\u914d\u4ef6': 'accessory', '\u793c\u7269\u7cbe\u9009': 'gift'
   };
   var budgetPattern = /\d{2,7}\s*\u5143|\u9884\u7b97|\u4ee5\u5185|\u4e0d\u8d85\u8fc7/;
   var detailTerms = ['\u529e\u516c', '\u6e38\u620f', '\u8bbe\u8ba1', '\u901a\u52e4', '\u5b66\u4e60', '\u65e5\u5e38', '\u9001\u793c', '\u751f\u65e5', '\u4f4e\u7cd6', '\u8fa3', '\u751c', '\u7b80\u7ea6', '\u6f6e\u6d41', '\u8fd0\u52a8'];

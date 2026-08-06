@@ -85,9 +85,9 @@ document.querySelectorAll('[data-recommendation-query]').forEach(link => {
 });
 
 document.querySelectorAll('.campaign-card').forEach((card, index) => {
-  if (index > 2) return;
   card.addEventListener('click', event => {
     event.preventDefault();
-    window.location.href = `deals.html?tab=${['subsidy', 'special', 'limited'][index]}`;
+    const promotionPages = ['subsidy.html', 'specials.html', 'flash-sale.html', 'summer-new.html'];
+    window.location.href = promotionPages[index] || 'index.html';
   });
 });

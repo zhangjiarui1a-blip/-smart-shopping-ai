@@ -22,10 +22,9 @@
   document.querySelector('#channelName').textContent = config.label + '\u9891\u9053';
   document.querySelector('#originalQuery').textContent = originalQuery;
   var channelProducts = (window.commerceProducts || []).filter(function (product) { return product.category === key; });
-  if (!channelProducts.length) channelProducts = (window.commerceProducts || []).slice(0, 4);
-  document.querySelector('#channelProducts').innerHTML = channelProducts.slice(0, 4).map(function (product) {
+  document.querySelector('#channelProducts').innerHTML = channelProducts.length ? channelProducts.slice(0, 4).map(function (product) {
     return '<a href="detail.html?id=' + product.id + '"><div class="channel-product-image ' + product.image + '"></div><span>' + product.tag + '</span><h3>' + product.name + '</h3><strong>¥' + product.price.toLocaleString() + '</strong><small>原价 ¥' + product.originalPrice.toLocaleString() + '</small></a>';
-  }).join('');
+  }).join('') : '<div class="channel-products__empty">\u8be5\u9891\u9053\u7684\u7cbe\u9009\u5546\u54c1\u6b63\u5728\u4e0a\u65b0\uff0c\u5148\u7528\u7b5b\u9009\u6807\u7b7e\u544a\u8bc9 AI \u4f60\u7684\u9700\u6c42\u5427\u3002</div>';
 
   function selectedValues() {
     return Object.keys(values).map(function (name) { return values[name]; }).filter(Boolean);

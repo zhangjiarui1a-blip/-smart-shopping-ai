@@ -8,6 +8,17 @@
   var hint = document.querySelector('#clarifyHint');
   var values = { query: query, budget: '', usage: '', priority: '' };
 
+  if (/\u6444\u5f71|\u76f8\u673a/.test(query)) {
+    var experienceField = document.querySelector('[data-field="priority"]');
+    experienceField.querySelector('legend').textContent = '03 \u7ecf\u9a8c';
+    experienceField.querySelector('p').textContent = '\u4f60\u76ee\u524d\u7684\u6444\u5f71\u7ecf\u9a8c\u5982\u4f55\uff1f';
+    var experienceOptions = experienceField.querySelector('.clarify-options');
+    experienceOptions.innerHTML = '<button type="button" data-value="\u6444\u5f71\u65b0\u624b">\u65b0\u624b</button>' +
+      '<button type="button" data-value="\u6444\u5f71\u8fdb\u9636">\u8fdb\u9636</button>' +
+      '<button type="button" data-value="\u6444\u5f71\u4e13\u4e1a">\u4e13\u4e1a</button>';
+    experienceField.querySelector('[data-custom-field]').placeholder = '\u6216\u8f93\u5165\u4f60\u7684\u6444\u5f71\u7ecf\u9a8c';
+  }
+
   function entryForQuery() {
     try {
       var saved = JSON.parse(window.sessionStorage.getItem('shoppingRecommendationEntry') || 'null');

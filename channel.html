@@ -1,2 +1,31 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Nova AI &#x8D2D;&#x7269;&#x9891;&#x9053;</title><link rel="stylesheet" href="./styles.css" /><style>body{background:#f5f7fb;color:#13213a}.channel{width:min(100%,960px);margin:auto;padding:28px 20px}.channel a{color:#285a9e;font-weight:750;text-decoration:none}.channel-box{margin-top:48px;padding:clamp(28px,7vw,70px);border:1px solid #dde5f0;border-radius:28px;background:linear-gradient(135deg,#fff,#edf4ff);box-shadow:0 20px 50px rgba(37,63,103,.09)}.channel-box p{color:#667894}.channel-box h1{font-size:clamp(36px,7vw,68px);letter-spacing:-.08em}.channel-box small{color:#75839a}</style></head><body><main class="channel"><a href="index.html">&#x2190; Nova AI &#x9996;&#x9875;</a><section class="channel-box"><p>NOVA SHOPPING CHANNEL</p><h1 id="channelName">&#x8D2D;&#x7269;&#x9891;&#x9053;</h1><p>&#x8BE5;&#x9891;&#x9053;&#x6B63;&#x5728;&#x5B8C;&#x5584;&#x4E2D;&#x3002;&#x73B0;&#x5728;&#x4F60;&#x53EF;&#x4EE5;&#x8FD4;&#x56DE;&#x9996;&#x9875;&#xFF0C;&#x8BA9; AI &#x6839;&#x636E;&#x4F60;&#x7684;&#x9884;&#x7B97;&#x4E0E;&#x9700;&#x6C42;&#x63A8;&#x8350;&#x5546;&#x54C1;&#x3002;</p><small>&#x9891;&#x9053;&#x72EC;&#x7ACB;&#x5185;&#x5BB9;&#x5C06;&#x5728;&#x540E;&#x7EED;&#x7248;&#x672C;&#x4E0A;&#x7EBF;&#x3002;</small></section></main><script>var category=new URLSearchParams(location.search).get('category');if(category)document.getElementById('channelName').textContent=category.replace(/;$/, '')+'频道';</script></body></html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Nova AI &#x9891;&#x9053;&#x667A;&#x80FD;&#x7B5B;&#x9009;" />
+    <title>Nova AI &#x8D2D;&#x7269;&#x9891;&#x9053;</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./channel.css" />
+  </head>
+  <body class="channel-page">
+    <main class="channel-shell">
+      <header class="channel-header"><a class="channel-brand" href="index.html"><span>N</span>Nova AI</a><a href="index.html">&#x8FD4;&#x56DE;&#x9996;&#x9875;</a></header>
+      <section class="channel-hero">
+        <div><p>NOVA SMART FILTER</p><h1 id="channelName">&#x667A;&#x80FD;&#x8D2D;&#x7269;&#x9891;&#x9053;</h1><span id="channelDescription">&#x7528;&#x51E0;&#x4E2A;&#x6807;&#x7B7E;&#xFF0C;&#x5FEB;&#x901F;&#x7F29;&#x5C0F;&#x9009;&#x62E9;&#x8303;&#x56F4;&#x3002;</span></div>
+        <div class="channel-query"><small>&#x5F53;&#x524D;&#x9700;&#x6C42;</small><strong id="originalQuery"></strong></div>
+      </section>
+      <section class="filter-board" aria-labelledby="filterTitle">
+        <div class="filter-board__head"><div><p>SMART TAGS</p><h2 id="filterTitle">&#x9009;&#x62E9;&#x4F60;&#x5728;&#x610F;&#x7684;&#x6761;&#x4EF6;</h2></div><span>&#x5355;&#x9009;&#x00B7;&#x53EF;&#x968F;&#x65F6;&#x8C03;&#x6574;</span></div>
+        <form id="channelFilterForm">
+          <div id="filterGroups" class="filter-groups"></div>
+          <label class="filter-extra"><span>&#x8FD8;&#x60F3;&#x8865;&#x5145;</span><input id="extraRequirement" maxlength="80" placeholder="&#x4F8B;&#x5982;&#xFF1A;&#x7EED;&#x822A;&#x957F;&#x3001;&#x9001;&#x4EBA;&#x3001;&#x4F4E;&#x7CD6;" /></label>
+          <div class="filter-action"><div><small>&#x5DF2;&#x9009;&#x6761;&#x4EF6;</small><p id="selectionSummary">&#x8BF7;&#x9009;&#x62E9;&#x81F3;&#x5C11;&#x4E00;&#x4E2A;&#x7B5B;&#x9009;&#x6807;&#x7B7E;</p></div><button id="filterSubmit" type="submit" disabled>AI &#x5E2E;&#x6211;&#x7B5B;&#x9009; <b>&#x2197;</b></button></div>
+        </form>
+      </section>
+      <section class="channel-note"><span>01</span><p>&#x9891;&#x9053;&#x6807;&#x7B7E;&#x5148;&#x5E2E;&#x4F60;&#x7F29;&#x5C0F;&#x5546;&#x54C1;&#x8303;&#x56F4;&#xFF0C;AI &#x518D;&#x5728;&#x5019;&#x9009;&#x5546;&#x54C1;&#x4E2D;&#x8FDB;&#x884C;&#x6392;&#x5E8F;&#x4E0E;&#x89E3;&#x91CA;&#x3002;</p></section>
+    </main>
+    <script src="./shopping-filter-service.js"></script>
+    <script src="./channel.js"></script>
+  </body>
+</html>

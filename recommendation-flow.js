@@ -87,11 +87,12 @@
       var budget = extractBudget(candidateQuery);
       var candidates = applyBudget(result.products || [], budget).slice(0, 10);
       var category = result.category || window.productService.categoryFor(candidateQuery);
+      var scenario = result.scenario || '';
       context = {
         query: query,
         answers: answers,
         candidates: candidates,
-        criteria: { budget: budget, category: category },
+        criteria: { budget: budget, category: category, scenario: scenario },
         candidateSource: result.source,
         candidateError: result.error || null,
         source: sourceFor(query)

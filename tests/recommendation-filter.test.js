@@ -30,7 +30,7 @@ const context = {
 };
 
 vm.createContext(context);
-['clarification-service.js', 'product-database.js', 'product-service.js', 'recommendation-service.js', 'recommendation-flow.js'].forEach(file => {
+['clarification-service.js', 'product-database.js', 'product-service.js', 'product-display.js', 'recommendation-service.js', 'recommendation-flow.js'].forEach(file => {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 });
 
@@ -46,9 +46,13 @@ async function run() {
   const gifts = await window.productService.getCandidates('\u63a8\u8350\u793c\u7269');
   assert.ok(gifts.products.length > 0, 'gift query should have products');
   assert.ok(gifts.products.every(product => product.name_cn && /[\u4e00-\u9fff]/.test(product.name_cn)), 'gift products must have Chinese names');
+  assert.equal(window.productService.intentFor('\u9001\u751f\u65e5\u793c\u7269').category, '', 'gift must be treated as a shopping scenario, not a product category');
+  assert.equal(window.productService.intentFor('\u9001\u751f\u65e5\u793c\u7269').scenario, 'gift', 'gift scenario must be detected');
+  assert.ok(/[\u4e00-\u9fff]/.test(window.productDisplayService.displayName(gifts.products[0])), 'display conversion must output a Chinese product name for gifts');
 
   const computer = window.recommendationFlow.decideEntry('\u4e70\u7535\u8111');
   assert.equal(computer.state, window.recommendationFlow.STATES.CLARIFY, 'incomplete computer query must enter clarification');
+  assert.equal(window.recommendationFlow.decideEntry('\u63a8\u8350\u96f6\u98df').state, window.recommendationFlow.STATES.CLARIFY, 'low-information shopping requests must enter clarification');
 
   responsePayload = { fallback: true, message: 'AI\u6682\u65f6\u7e41\u5fd9', products: [] };
   const timeoutResult = await window.recommendationFlow.run({ query: '\u63a8\u8350\u96f6\u98df', answers: {} });

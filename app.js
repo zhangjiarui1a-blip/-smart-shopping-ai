@@ -42,3 +42,10 @@ document.querySelectorAll('.categories a').forEach(link => {
     beginRecommendation('category', query);
   });
 });
+
+document.querySelectorAll('[data-recommendation-query]').forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    beginRecommendation('ai_discovery', link.dataset.recommendationQuery || link.textContent.trim());
+  });
+});

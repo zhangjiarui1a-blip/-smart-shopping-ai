@@ -128,6 +128,19 @@
     }
   ];
 
+  var CHINESE_NAMES = {
+    'gift-pen-set': '\u7ecf\u5178\u5546\u52a1\u94a2\u7b14\u793c\u76d2',
+    'gift-scent-box': '\u9999\u6c1b\u62a4\u7406\u793c\u76d2',
+    'gift-block-bouquet': '\u521b\u610f\u79ef\u6728\u82b1\u675f',
+    'gift-record-player': '\u590d\u53e4\u5531\u7247\u673a',
+    'gift-cup-set': '\u4fdd\u6e29\u676f\u793c\u76d2',
+    'gift-chocolate': '\u624b\u5de5\u5de7\u514b\u529b',
+    'gift-photo-frame': '\u5b9a\u5236\u56de\u5fc6\u76f8\u6846',
+    'gift-tea-set': '\u7cbe\u9009\u8336\u793c\u76d2',
+    'gift-fitness-band': '\u667a\u80fd\u8fd0\u52a8\u624b\u73af',
+    'gift-travel-set': '\u65c5\u884c\u6536\u7eb3\u793c\u76d2'
+  };
+
   function createProduct(group, item) {
     var id = item[0];
     var name = item[1];
@@ -139,6 +152,7 @@
 
     return {
       id: id,
+      name_cn: CHINESE_NAMES[id] || group.category + '\u7cbe\u9009\u5546\u54c1',
       name: name,
       category: group.category,
       price: price,

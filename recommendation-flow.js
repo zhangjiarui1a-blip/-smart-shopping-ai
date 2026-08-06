@@ -122,12 +122,20 @@
         return fallbackResult;
       }
 
-      var products = Array.isArray(payload) ? payload : (Array.isArray(payload.products) ? payload.products : null);
-      if (!products) {
+      var selected = Array.isArray(payload) ? payload : (Array.isArray(payload.products) ? payload.products : null);
+      if (!selected) {
         var invalid = new Error('AI response did not include a products array');
         invalid.code = 'INVALID_RESPONSE';
         throw invalid;
       }
+      var products = selected.map(function (item) {
+        var original = candidates.filter(function (candidate) { return candidate.id === item.id; })[0];
+        if (!original) return null;
+        return Object.assign({}, original, {
+          reason: item.reason || original.reason,
+          score: Number(item.score) || original.score
+        });
+      }).filter(Boolean);
 
       var success = {
         state: STATES.SUCCESS,

@@ -43,6 +43,7 @@
 
     return {
       id: product.id || product._id || '',
+      name_cn: product.name_cn || product.nameCn || '',
       name: product.name || '',
       category: product.category || '',
       brand: product.brand || '',

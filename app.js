@@ -25,9 +25,18 @@ function openResult(source, query) {
   window.location.href = `result.html?q=${encodeURIComponent(entry.query)}`;
 }
 
+function openDetail(source, id) {
+  saveEntry(source, id);
+  window.location.href = `detail.html?id=${encodeURIComponent(id)}`;
+}
+
 function beginRecommendation(source, query) {
   const cleanQuery = String(query || '').trim();
-  if (source === 'product_feed') {
+  if (source.indexOf('product_feed:') === 0) {
+    openDetail(source, source.split(':')[1]);
+    return;
+  }
+  if (source === 'ai_discovery') {
     openResult(source, cleanQuery);
     return;
   }
@@ -69,7 +78,16 @@ document.querySelectorAll('[data-prompt]').forEach(chip => {
 document.querySelectorAll('[data-recommendation-query]').forEach(link => {
   link.addEventListener('click', event => {
     event.preventDefault();
-    const source = link.classList.contains('idea-card') ? 'ai_discovery' : 'product_feed';
+    const feedIds = ['nova-phone', 'air-14', 'quiet-pro', 'classic-watch'];
+    const source = link.classList.contains('idea-card') ? 'ai_discovery' : `product_feed:${feedIds[Array.prototype.indexOf.call(document.querySelectorAll('.feed-card'), link)] || 'nova-phone'}`;
     beginRecommendation(source, link.dataset.recommendationQuery || link.textContent.trim());
+  });
+});
+
+document.querySelectorAll('.campaign-card').forEach((card, index) => {
+  if (index > 2) return;
+  card.addEventListener('click', event => {
+    event.preventDefault();
+    window.location.href = `deals.html?tab=${['subsidy', 'special', 'limited'][index]}`;
   });
 });

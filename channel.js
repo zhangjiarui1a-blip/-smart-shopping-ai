@@ -21,6 +21,11 @@
 
   document.querySelector('#channelName').textContent = config.label + '\u9891\u9053';
   document.querySelector('#originalQuery').textContent = originalQuery;
+  var channelProducts = (window.commerceProducts || []).filter(function (product) { return product.category === key; });
+  if (!channelProducts.length) channelProducts = (window.commerceProducts || []).slice(0, 4);
+  document.querySelector('#channelProducts').innerHTML = channelProducts.slice(0, 4).map(function (product) {
+    return '<a href="detail.html?id=' + product.id + '"><div class="channel-product-image ' + product.image + '"></div><span>' + product.tag + '</span><h3>' + product.name + '</h3><strong>¥' + product.price.toLocaleString() + '</strong><small>原价 ¥' + product.originalPrice.toLocaleString() + '</small></a>';
+  }).join('');
 
   function selectedValues() {
     return Object.keys(values).map(function (name) { return values[name]; }).filter(Boolean);

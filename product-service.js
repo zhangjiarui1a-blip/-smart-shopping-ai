@@ -44,6 +44,7 @@
     return {
       id: product.id || product._id || '',
       name_cn: product.name_cn || product.nameCn || '',
+      title: product.title || product.title_cn || '',
       name: product.name || '',
       category: product.category || '',
       brand: product.brand || '',

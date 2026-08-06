@@ -114,7 +114,7 @@
     var alternatives = report.alternatives.length
       ? report.alternatives.map(function (item) {
         return '<a class="alternative-item" href="detail.html?id=' + encodeURIComponent(item.id || '') + '">' +
-          '<span>' + escapeHtml(item.name_cn || item.name || '\u66ff\u4ee3\u5546\u54c1') + '</span><b>' + escapeHtml(formatPrice(item.price)) + '</b>' +
+          '<span>' + escapeHtml(item.name_cn || item.title || item.name || '\u66ff\u4ee3\u5546\u54c1') + '</span><b>' + escapeHtml(formatPrice(item.price)) + '</b>' +
           '<small>' + escapeHtml(item.reason || item.description || '\u53ef\u4f5c\u4e3a\u66ff\u4ee3\u9009\u62e9\u3002') + '</small></a>';
       }).join('')
       : '<p class="report-empty">\u6682\u65e0\u5176\u4ed6\u540c\u7c7b\u66ff\u4ee3\u9009\u62e9\u3002</p>';
@@ -151,7 +151,7 @@
     var score = Math.max(0, Math.min(100, Number(item.score) || 80));
     return '<article class="recommendation-card"><div class="result-image ' + safeImageClass(item.image) + '"></div><div class="result-main">' +
       '<div class="result-meta"><span class="result-type">' + (index === 0 ? 'AI \u9996\u9009 \u00b7 ' : '') + escapeHtml(item.type || item.category || '\u5546\u54c1\u63a8\u8350') + '</span><span class="score">\u63a8\u8350\u6307\u6570 ' + score + '</span></div>' +
-      '<h4>' + escapeHtml(item.name_cn || item.name || '\u672a\u547d\u540d\u5546\u54c1') + '</h4><strong class="result-price">' + escapeHtml(formatPrice(item.price)) + '</strong>' + renderTags(item.tags) +
+      '<h4>' + escapeHtml(item.name_cn || item.title || item.name || '\u672a\u547d\u540d\u5546\u54c1') + '</h4><strong class="result-price">' + escapeHtml(formatPrice(item.price)) + '</strong>' + renderTags(item.tags) +
       '<div class="result-reason"><b>\u63a8\u8350\u7406\u7531</b><p>' + escapeHtml(item.reason || item.description || '\u7ed3\u5408\u9700\u6c42\u8fdb\u884c\u7b5b\u9009\u3002') + '</p></div>' +
       '<div class="result-details"><div><b>\u4f18\u70b9</b>' + renderList(item.pros) + '</div><div><b>\u6ce8\u610f\u70b9</b>' + renderList(item.cons) + '</div></div>' +
       '<p class="audience"><b>\u9002\u5408\u4eba\u7fa4\uff1a</b>' + escapeHtml(item.people || item.suitableFor || '\u5e0c\u671b\u6839\u636e\u9700\u6c42\u7b5b\u9009\u7684\u7528\u6237') + '</p>' +

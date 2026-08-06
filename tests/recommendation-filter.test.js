@@ -38,6 +38,9 @@ async function run() {
   assert.ok(dogFood.products.length > 0, 'dog-food query should have products');
   assert.ok(dogFood.products.every(product => product.category === '\u5ba0\u7269\u7528\u54c1'), 'dog-food query must only return pet products');
 
+  const prepared = await window.recommendationService.loadCandidateContext('\u63a8\u8350\u96f6\u98df', {});
+  assert.equal(prepared.status, window.recommendationService.STATES.INPUT, 'candidate preparation must begin in INPUT state');
+
   const empty = await window.recommendationService.requestAiAnalysis({
     query: '\u4e0d\u5b58\u5728\u7684\u5546\u54c1\u7c7b\u522b',
     candidates: [],
@@ -46,6 +49,7 @@ async function run() {
     answers: {}
   });
   assert.equal(empty.source, 'empty', 'empty candidates should skip AI and return an empty recommendation');
+  assert.equal(empty.status, window.recommendationService.STATES.SUCCESS, 'empty candidates are a handled result, not an AI failure');
   assert.equal(aiRequestCount, 0, 'AI must not be called without filtered candidates');
 
   console.log('recommendation filtering tests passed');

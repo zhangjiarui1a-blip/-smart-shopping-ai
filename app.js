@@ -3,7 +3,7 @@ const input = document.querySelector('#recommendationInput');
 const button = document.querySelector('#recommendButton');
 let entrySource = 'search';
 
-input.placeholder = '\u63cf\u8ff0\u4f60\u7684\u9700\u6c42\uff0cAI\u5e2e\u4f60\u627e\u5230\u6700\u9002\u5408\u7684\u9009\u62e9';
+input.placeholder = '\u63cf\u8ff0\u4f60\u7684\u9700\u6c42\uff0cAI\u5e2e\u4f60\u505a\u9009\u62e9';
 
 function beginRecommendation(source, query) {
   const cleanQuery = String(query || '').trim();

@@ -166,6 +166,13 @@
   var conversation = [{ role: 'user', text: query }];
   var activeLoadingTimer;
   var stageRequestId = 0;
+  var requestInFlight = false;
+  var currentState = window.recommendationService.STATES.INPUT;
+
+  function transition(nextState, detail) {
+    currentState = nextState;
+    console.info('[RECOMMENDATION STATE]', currentState, detail || {});
+  }
 
   function showLoading(target, text) {
     window.clearInterval(activeLoadingTimer);
@@ -258,7 +265,10 @@
   }
 
   async function requestStage(target, reportTarget, loadingText) {
+    if (requestInFlight) return;
+    requestInFlight = true;
     var requestId = ++stageRequestId;
+    transition(window.recommendationService.STATES.INPUT, { requestId: requestId });
     showLoading(target, loadingText);
     try {
       var context = await window.recommendationService.loadCandidateContext(query, collectedAnswers);
@@ -267,6 +277,7 @@
       window.clearInterval(activeLoadingTimer);
       target.setAttribute('aria-busy', 'true');
       renderCandidateLoading(context, target, reportTarget);
+      transition(window.recommendationService.STATES.ANALYZING, { requestId: requestId, candidateCount: context.candidates.length });
       console.info('[AI REQUEST]', { candidateCount: context.candidates.length, requestId: requestId });
 
       await new Promise(function (resolve) { window.requestAnimationFrame(resolve); });
@@ -275,15 +286,22 @@
       var result = await window.recommendationService.requestAiAnalysis(context);
       if (requestId !== stageRequestId) return;
       console.info('[AI RESPONSE]', { stage: result.stage, requestId: requestId });
-      if (result.stage === 'collecting_requirements') renderConversation(result, target, reportTarget);
-      else renderRecommendations(result, target, reportTarget);
+      if (result.status === window.recommendationService.STATES.CLARIFY) {
+        transition(window.recommendationService.STATES.CLARIFY, { requestId: requestId });
+        renderConversation(result, target, reportTarget);
+      } else {
+        transition(window.recommendationService.STATES.SUCCESS, { requestId: requestId, productCount: result.products.length });
+        renderRecommendations(result, target, reportTarget);
+      }
     } catch (error) {
       if (requestId !== stageRequestId) return;
+      transition(window.recommendationService.STATES.FAILED, { requestId: requestId });
       console.error('[AI RESPONSE]', { status: 'failed', reason: error && error.message ? error.message : String(error) });
       if (typeof context !== 'undefined') renderAiFailure(context, target, reportTarget, error && error.message ? error.message : String(error));
       else target.innerHTML = renderAlert('error', '\u63a8\u8350\u9875\u52a0\u8f7d\u5931\u8d25', '\u65e0\u6cd5\u52a0\u8f7d\u5546\u54c1\u5019\u9009\uff0c\u8bf7\u8fd4\u56de\u9996\u9875\u91cd\u8bd5\u3002');
     } finally {
       if (requestId === stageRequestId) stopLoading(target);
+      requestInFlight = false;
     }
   }
 

@@ -3,62 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="AI 宠物购物助手，为宠物推荐合适商品。" />
-    <title>AI 宠物购物助手</title>
+    <meta name="description" content="Nova AI &#x2014; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x7A7A;&#x95F4;" />
+    <title>Nova AI &#x2014; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;&#x7A7A;&#x95F4;</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./category.css" />
+    <link rel="stylesheet" href="./home.css" />
   </head>
-  <body>
-    <main class="page-shell">
-      <header class="site-header">
-        <a class="brand" href="#top" aria-label="AI 宠物购物助手首页">
-          <span class="brand-icon" aria-hidden="true">✦</span><span>Nova AI</span>
-        </a>
-        <span class="status"><i></i> AI 推荐已就绪</span>
+  <body class="home-page">
+    <main class="nova-home">
+      <div class="home-glow home-glow--one" aria-hidden="true"></div>
+      <div class="home-glow home-glow--two" aria-hidden="true"></div>
+      <div class="home-grid" aria-hidden="true"></div>
+
+      <header class="home-header" id="top">
+        <a class="home-brand" href="#top" aria-label="Nova AI &#x9996;&#x9875;"><span class="home-brand__mark">N</span><span>Nova AI</span></a>
+        <div class="home-status"><i></i><span>DECISION SPACE ONLINE</span></div>
       </header>
 
-      <section class="hero" id="top" aria-labelledby="page-title">
-        <div class="orb orb-one" aria-hidden="true"></div><div class="orb orb-two" aria-hidden="true"></div>
-        <p class="eyebrow">INTELLIGENT SHOPPING, SIMPLIFIED</p>
-        <h1 id="page-title">AI 智能购物助手</h1>
-        <p class="subtitle">输入预算、需求和偏好，AI 为你快速推荐值得购买的商品。</p>
-        <div class="pet-pills" aria-label="服务特点"><span>个性化推荐</span><span>清晰的购买建议</span><span>模拟 AI 回复</span></div>
+      <section class="future-hero" aria-labelledby="page-title">
+        <div class="hero-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="home-kicker">THE FUTURE OF SHOPPING DECISIONS</p>
+        <h1 id="page-title">AI&#x667A;&#x80FD;&#x8D2D;&#x7269;&#x52A9;&#x624B;</h1>
+        <p class="home-intro">不止发现商品。Nova AI 理解你的需求、预算与偏好，帮你找到更值得做出的选择。</p>
+
+        <section class="chat-card command-dock" aria-labelledby="chat-title">
+          <div class="dock-head"><div class="dock-signal"><span></span><span></span><span></span></div><div><p>NOVA CORE</p><h2 id="chat-title">现在，想探索什么？</h2></div><small>AI READY</small></div>
+          <form id="assistantForm" class="chat-form">
+            <label class="sr-only" for="recommendationInput">&#x8D2D;&#x7269;&#x9700;&#x6C42;</label>
+            <input id="recommendationInput" name="query" maxlength="160" placeholder="&#x63CF;&#x8FF0;&#x4F60;&#x7684;&#x9700;&#x6C42;&#xFF0C;AI&#x5E2E;&#x4F60;&#x505A;&#x9009;&#x62E9;" autocomplete="off" />
+            <button id="recommendButton" type="submit" aria-label="&#x5F00;&#x59CB; AI &#x8D2D;&#x7269;&#x51B3;&#x7B56;"><span>&#x5F00;&#x59CB;&#x63A2;&#x7D22;</span><b aria-hidden="true">&#x2197;</b></button>
+          </form>
+          <div class="quick-prompts" aria-label="&#x63A8;&#x8350;&#x7075;&#x611F;"><span>&#x5FEB;&#x901F;&#x63A2;&#x7D22;</span><button type="button" data-prompt="&#x63A8;&#x8350;&#x6570;&#x7801;">&#x6570;&#x7801;&#x88C5;&#x5907;</button><button type="button" data-prompt="&#x4E70;&#x7535;&#x8111;">&#x7535;&#x8111;&#x51B3;&#x7B56;</button><button type="button" data-prompt="&#x63A8;&#x8350;&#x96F6;&#x98DF;">&#x751F;&#x6D3B;&#x96F6;&#x98DF;</button><button type="button" data-prompt="&#x63A8;&#x8350;&#x793C;&#x7269;">&#x793C;&#x7269;&#x7075;&#x611F;</button></div>
+          <div id="recommendationResult" class="response" aria-live="polite" hidden></div>
+        </section>
       </section>
 
-      <section class="categories" aria-label="购物分类">
-        <a href="result.html?q=数码产品推荐">数码</a><a href="result.html?q=电脑推荐">电脑</a><a href="result.html?q=手机推荐">手机</a><a href="result.html?q=宠物用品推荐">宠物用品</a><a href="result.html?q=家居推荐">家居</a><a href="result.html?q=礼物推荐">礼物</a>
-      </section>
-      <section class="chat-card" aria-labelledby="chat-title">
-        <div class="chat-heading">
-          <div class="ai-avatar" aria-hidden="true">✦</div>
-          <div><p>NOVA AI</p><h2 id="chat-title">告诉我你想买什么</h2></div>
-        </div>
-        <div class="welcome-message">描述预算、使用场景和偏好，我会帮你快速梳理值得优先考虑的商品。</div>
-        <form id="assistantForm" class="chat-form">
-          <label class="sr-only" for="recommendationInput">宠物购物需求</label>
-          <input id="recommendationInput" name="query" maxlength="160" placeholder="描述你的需求，AI帮你找到最适合的选择" autocomplete="off" />
-          <button id="recommendButton" type="submit" aria-label="发送消息"><span>发送</span><b aria-hidden="true">↗</b></button>
-        </form>
-        <div class="quick-prompts" aria-label="快捷推荐">
-          <button type="button" data-prompt="推荐狗粮">🐶 推荐狗粮</button>
-          <button type="button" data-prompt="推荐猫粮">🐱 推荐猫粮</button>
-          <button type="button" data-prompt="推荐零食">🦴 推荐零食</button>
-          <button type="button" data-prompt="推荐玩具">🧶 推荐玩具</button>
-        </div>
-        <div id="recommendationResult" class="response" aria-live="polite" hidden></div>
+      <section class="space-section" aria-labelledby="spaces-title">
+        <div class="section-lead"><p class="home-kicker">EXPLORE BY INTENT</p><h2 id="spaces-title">进入你的购物空间</h2><p>从一个方向开始，让 AI 帮你展开更清晰的选择。</p></div>
+        <nav class="categories space-gates" aria-label="&#x8D2D;&#x7269;&#x7A7A;&#x95F4;">
+          <a class="space-gate space-gate--digital" href="result.html?q=&#x6570;&#x7801;&#x4EA7;&#x54C1;&#x63A8;&#x8350;"><span class="gate-index">01</span><span class="gate-icon">&#x2726;</span><strong>&#x6570;&#x7801;&#x7A7A;&#x95F4;</strong><small>科技与效率</small></a>
+          <a class="space-gate space-gate--life" href="result.html?q=&#x5BB6;&#x5C45;&#x4EA7;&#x54C1;&#x63A8;&#x8350;"><span class="gate-index">02</span><span class="gate-icon">&#x25CE;</span><strong>&#x751F;&#x6D3B;&#x7A7A;&#x95F4;</strong><small>日常与舒适</small></a>
+          <a class="space-gate space-gate--trend" href="result.html?q=&#x624B;&#x673A;&#x63A8;&#x8350;"><span class="gate-index">03</span><span class="gate-icon">&#x25C7;</span><strong>&#x6F6E;&#x6D41;&#x7A7A;&#x95F4;</strong><small>风格与表达</small></a>
+          <a class="space-gate space-gate--gift" href="result.html?q=&#x793C;&#x7269;&#x63A8;&#x8350;"><span class="gate-index">04</span><span class="gate-icon">&#x2734;</span><strong>&#x793C;&#x7269;&#x7A7A;&#x95F4;</strong><small>心意与惊喜</small></a>
+        </nav>
       </section>
 
-      <section class="products" aria-labelledby="products-title">
-        <div class="section-heading"><div><p class="eyebrow">EDITOR'S PICKS</p><h2 id="products-title">今日值得关注</h2></div><p>精选示例商品 · 模拟数据</p></div>
-        <div class="product-grid">
-          <article class="product-card"><div class="product-image laptop"></div><p class="product-type">轻薄笔记本</p><h3>Air 14 轻薄笔记本</h3><strong>¥ 4,999</strong><button type="button">查看建议</button></article>
-          <article class="product-card"><div class="product-image headphones"></div><p class="product-type">降噪耳机</p><h3>Quiet Pro 无线耳机</h3><strong>¥ 1,299</strong><button type="button">查看建议</button></article>
-          <article class="product-card"><div class="product-image phone"></div><p class="product-type">旗舰手机</p><h3>One Pro 智能手机</h3><strong>¥ 5,699</strong><button type="button">查看建议</button></article>
-          <article class="product-card"><div class="product-image watch"></div><p class="product-type">智能穿戴</p><h3>Fit Watch Series 3</h3><strong>¥ 1,899</strong><button type="button">查看建议</button></article>
+      <section class="discover-section" aria-labelledby="discover-title">
+        <div class="section-lead"><p class="home-kicker">NOVA SIGNALS</p><h2 id="discover-title">今日 AI 发现</h2></div>
+        <div class="discover-grid">
+          <article class="discover-card discover-card--feature"><p>SMART SCENARIO / 01</p><h3>为通勤生活<br />构建轻盈装备</h3><span>轻薄电脑 · 降噪耳机 · 长续航</span><a href="result.html?q=&#x901A;&#x52E4;&#x6570;&#x7801;&#x88C5;&#x5907;&#x63A8;&#x8350;">探索方案 <b>→</b></a></article>
+          <article class="discover-card"><span class="discover-number">02</span><p>热门购物方案</p><h3>预算内的性能平衡</h3><small>从需求出发，而不是参数堆叠。</small></article>
+          <article class="discover-card"><span class="discover-number">03</span><p>智能推荐空间</p><h3>让选择更有把握</h3><small>结合预算、场景与偏好，得到可解释的建议。</small></article>
         </div>
       </section>
 
-      <p class="disclaimer">本页面展示的是模拟 AI 推荐，不连接任何外部 AI 服务或商品接口。</p>
+      <footer class="home-footer"><span>© NOVA AI</span><span>SHOP WITH CLARITY</span></footer>
     </main>
     <script src="./clarification-service.js"></script>
     <script src="./app.js"></script>

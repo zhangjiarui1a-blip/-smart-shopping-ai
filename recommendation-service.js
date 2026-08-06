@@ -2,6 +2,18 @@
   'use strict';
 
   var endpoint = String(window.RECOMMENDATIONS_API_URL || '').trim();
+  var STATES = {
+    INPUT: 'INPUT',
+    CLARIFY: 'CLARIFY',
+    ANALYZING: 'ANALYZING',
+    SUCCESS: 'SUCCESS',
+    FAILED: 'FAILED'
+  };
+
+  function withState(status, data) {
+    data.status = status;
+    return data;
+  }
 
   function extractBudget(query) {
     var text = String(query || '');
@@ -37,27 +49,8 @@
     return { source: 'search', query: query, candidates: [] };
   }
 
-  function fallbackRecommendation(context, error) {
-    console.warn('[FALLBACK]', {
-      query: context.query,
-      category: context.criteria.category || 'unclassified',
-      candidateCount: context.candidates.length,
-      reason: error || 'AI unavailable'
-    });
-    return {
-      stage: 'recommend',
-      query: context.query,
-      profile: context.criteria,
-      products: context.candidates.slice(0, 3),
-      source: 'fallback',
-      candidateSource: context.candidateSource,
-      error: error || null,
-      answers: context.answers
-    };
-  }
-
   function emptyRecommendation(context) {
-    return {
+    return withState(STATES.SUCCESS, {
       stage: 'recommend',
       query: context.query,
       profile: context.criteria,
@@ -66,7 +59,7 @@
       candidateSource: context.candidateSource,
       error: null,
       answers: context.answers
-    };
+    });
   }
 
   async function loadCandidateContext(query, answers) {
@@ -94,7 +87,7 @@
     console.info('[ENTRY] query=', cleanQuery);
     console.info('[ENTRY] candidates length=', candidates.length);
 
-    return {
+    return withState(STATES.INPUT, {
       query: cleanQuery,
       entry: { source: entry.source, query: cleanQuery, candidates: candidates },
       answers: collectedAnswers,
@@ -102,17 +95,17 @@
       criteria: { budget: budget, category: category },
       candidateSource: candidateResult.source,
       candidateError: candidateResult.error || null
-    };
+    });
   }
 
   async function requestAiAnalysis(context) {
-    if (!endpoint) {
-      throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
-    }
-
     if (!context.candidates.length) {
       console.warn('[FALLBACK]', { query: context.query, reason: 'No matching products after category filter' });
       return emptyRecommendation(context);
+    }
+
+    if (!endpoint) {
+      throw new Error('window.RECOMMENDATIONS_API_URL is not configured');
     }
 
     console.info('[AI REQUEST]', {
@@ -144,7 +137,7 @@
     }
 
     if (payload && payload.stage === 'collecting_requirements') {
-      return {
+      return withState(STATES.CLARIFY, {
         stage: 'collecting_requirements',
         query: context.query,
         profile: payload.profile || {},
@@ -154,7 +147,7 @@
         candidateSource: context.candidateSource,
         error: null,
         answers: context.answers
-      };
+      });
     }
 
     var apiProducts = Array.isArray(payload)
@@ -165,7 +158,7 @@
       throw new Error('AI response did not include recommended products');
     }
 
-    return {
+    return withState(STATES.SUCCESS, {
       stage: 'recommend',
       query: context.query,
       profile: payload && payload.profile ? payload.profile : context.criteria,
@@ -174,24 +167,13 @@
       candidateSource: context.candidateSource,
       error: null,
       answers: context.answers
-    };
-  }
-
-  async function getRecommendations(query, answers) {
-    var context = await loadCandidateContext(query, answers);
-    try {
-      return await requestAiAnalysis(context);
-    } catch (error) {
-      var message = error && error.message ? error.message : String(error);
-      console.error('[AI RESPONSE]', { status: 'failed', reason: message });
-      return fallbackRecommendation(context, message);
-    }
+    });
   }
 
   window.recommendationService = {
+    STATES: STATES,
     loadCandidateContext: loadCandidateContext,
     requestAiAnalysis: requestAiAnalysis,
-    getRecommendations: getRecommendations,
     config: { endpoint: endpoint }
   };
 }());

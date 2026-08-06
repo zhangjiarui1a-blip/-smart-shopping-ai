@@ -73,8 +73,8 @@
     if (!selectedValues().length) return;
     var extra = document.querySelector('#extraRequirement').value.trim();
     var finalQuery = [originalQuery, config.label].concat(selectedValues()).concat(extra ? [extra] : []).join('\uff0c');
-    var usage = values.usage || values.type || values.style || values.taste || values.need || '';
-    var priority = values.brand || values.style || values.taste || values.need || values.priority || '';
+    var usage = values.usage || values.scene || values.type || values.style || values.taste || values.need || '';
+    var priority = values.performance || values.brand || values.style || values.taste || values.need || values.priority || '';
     var result = {
       query: finalQuery,
       originalQuery: originalQuery,

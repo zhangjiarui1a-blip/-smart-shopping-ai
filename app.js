@@ -20,8 +20,17 @@ function openChannel(source, query, channel) {
   window.location.href = `channel.html?${params.toString()}`;
 }
 
+function openResult(source, query) {
+  const entry = saveEntry(source, query);
+  window.location.href = `result.html?q=${encodeURIComponent(entry.query)}`;
+}
+
 function beginRecommendation(source, query) {
   const cleanQuery = String(query || '').trim();
+  if (source === 'product_feed') {
+    openResult(source, cleanQuery);
+    return;
+  }
   const filterDecision = window.shoppingFilterService
     ? window.shoppingFilterService.decide(cleanQuery, { source })
     : { mode: 'direct', channel: '' };
@@ -31,11 +40,14 @@ function beginRecommendation(source, query) {
     return;
   }
 
-  const clarification = window.recommendationFlow.decideEntry(cleanQuery);
   const entry = saveEntry(source, cleanQuery);
-  window.sessionStorage.setItem('shoppingClarificationDecision', JSON.stringify(clarification));
-  const needsClarification = filterDecision.mode === 'clarify' || clarification.state === window.recommendationFlow.STATES.CLARIFY;
-  window.location.href = `${needsClarification ? 'clarification.html' : 'result.html'}?q=${encodeURIComponent(entry.query)}`;
+  const route = filterDecision.mode === 'clarify' ? 'clarification.html' : 'result.html';
+  window.sessionStorage.setItem('shoppingClarificationDecision', JSON.stringify({
+    state: filterDecision.mode === 'clarify' ? 'CLARIFY' : 'INPUT',
+    query: cleanQuery,
+    source: source
+  }));
+  window.location.href = `${route}?q=${encodeURIComponent(entry.query)}`;
 }
 
 form.addEventListener('submit', event => {

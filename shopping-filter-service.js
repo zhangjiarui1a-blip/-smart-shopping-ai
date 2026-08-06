@@ -9,6 +9,7 @@
         { key: 'type', label: '\u54c1\u7c7b', options: ['\u624b\u673a', '\u7535\u8111', '\u5e73\u677f', '\u8033\u673a', '\u76f8\u673a', '\u667a\u80fd\u8bbe\u5907'] },
         { key: 'brand', label: '\u54c1\u724c', options: ['Apple', '\u534e\u4e3a', '\u5c0f\u7c73', '\u8054\u60f3'] },
         { key: 'budget', label: '\u4ef7\u683c', options: ['1000\u4ee5\u4e0b', '3000-5000', '5000+'] },
+        { key: 'performance', label: '\u6027\u80fd', options: ['\u7a33\u5b9a\u65e5\u5e38', '\u6027\u80fd\u4f18\u5148', '\u4e13\u4e1a\u521b\u4f5c'] },
         { key: 'usage', label: '\u7528\u9014', options: ['\u529e\u516c', '\u6e38\u620f', '\u8bbe\u8ba1', '\u6444\u5f71'] }
       ]
     },
@@ -27,6 +28,7 @@
       groups: [
         { key: 'type', label: '\u7c7b\u578b', options: ['\u96f6\u98df', '\u996e\u6599', '\u575a\u679c', '\u8089\u7c7b'] },
         { key: 'taste', label: '\u53e3\u5473', options: ['\u8fa3', '\u751c', '\u54b8\u9999', '\u4f4e\u7cd6'] },
+        { key: 'scene', label: '\u573a\u666f', options: ['\u8ffd\u5267', '\u529e\u516c\u5ba4', '\u901a\u52e4', '\u9001\u793c'] },
         { key: 'budget', label: '\u4ef7\u683c', options: ['100\u4ee5\u4e0b', '100-300', '300+'] }
       ]
     },
@@ -80,7 +82,9 @@
 
   function isComplex(query) {
     var text = String(query || '');
-    return includesAny(text, ['\u6444\u5f71\u8bbe\u5907', '\u6444\u5f71\u5168\u5957', '\u76f8\u673a\u5168\u5957']) && !isComplete(text);
+    var highValue = text.match(/(\d{4,7})\s*\u5143/);
+    return includesAny(text, ['\u6444\u5f71\u8bbe\u5907', '\u6444\u5f71\u5168\u5957', '\u76f8\u673a\u5168\u5957', '\u6c7d\u8f66', '\u88c5\u4fee', '\u5168\u5c4b']) ||
+      (highValue && Number(highValue[1]) >= 10000);
   }
 
   function autoSelections(query, config) {

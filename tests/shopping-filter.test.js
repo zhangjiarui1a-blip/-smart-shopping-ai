@@ -29,5 +29,7 @@ assert.equal(auto.usage, '\u6e38\u620f', 'discovery must prefill usage');
 assert.equal(auto.budget, '3000-5000', 'discovery must prefill budget range');
 
 assert.equal(service.decide('\u6444\u5f71\u8bbe\u5907\u8d2d\u4e70', { source: 'search' }).mode, 'clarify', 'complex photography request must retain clarification flow');
+assert.equal(service.decide('\u6c7d\u8f66\u8d2d\u4e70\u5efa\u8bae', { source: 'search' }).mode, 'clarify', 'car purchase must retain clarification flow');
+assert.equal(service.decide('20000\u5143\u65b0\u5bb6\u88c5\u4fee', { source: 'search' }).mode, 'clarify', 'high-value purchase must retain clarification flow');
 
 console.log('V0.5.1 shopping filter tests passed');

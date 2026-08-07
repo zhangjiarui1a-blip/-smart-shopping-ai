@@ -1,0 +1,27 @@
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const root = path.join(__dirname, '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+
+const context = { window: {} };
+vm.runInNewContext(read('product-insights.js'), context);
+const insight = context.window.productInsights.get({ category: 'digital', sales: '2.3万+' });
+['score', 'scene', 'pros', 'risks', 'match'].forEach((key) => assert(insight[key]));
+assert.match(read('mall.js'), /AI .*分/);
+assert.match(read('mall.js'), /优势/);
+assert.match(read('mall.js'), /风险/);
+assert.match(read('mall.js'), /匹配理由/);
+assert.match(read('detail.js'), /AI 购买决策/);
+assert.match(read('detail.js'), /用户需求分析/);
+assert.match(read('detail.js'), /不推荐场景/);
+assert.match(read('detail.js'), /同价位替代/);
+assert.match(read('detail.js'), /为什么推荐/);
+assert.match(read('detail.js'), /更便宜选择/);
+assert.match(read('search-suggestions.js'), /相关分类/);
+assert.match(read('search-suggestions.js'), /品牌/);
+assert.match(read('search-suggestions.js'), /热门需求/);
+assert.match(read('search-suggestions.js'), /送礼/);
+assert.match(read('search-suggestions.js'), /AI 帮我做购买决策/);
+console.log('V0.9 product decision tests passed');

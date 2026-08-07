@@ -70,7 +70,7 @@
     window.localStorage.setItem('shoppingClarification', JSON.stringify(result));
     window.sessionStorage.setItem('shoppingChannelFilters', JSON.stringify(result));
     window.sessionStorage.setItem('shoppingRecommendationEntry', JSON.stringify({ source: 'channel_filter', query: finalQuery, candidates: [] }));
-    submit.disabled = true; submit.textContent = '正在匹配...'; window.location.href = 'result.html?q=' + encodeURIComponent(finalQuery);
+    submit.disabled = true; submit.textContent = '正在匹配...'; window.router.go('result.html?q=' + encodeURIComponent(finalQuery));
   });
   renderProducts(); refresh();
 }());

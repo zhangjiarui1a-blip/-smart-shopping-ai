@@ -4,7 +4,11 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 assert.match(read('router.js'), /window\.router/);
-['index.html', 'channel.html', 'result.html', 'profile.html'].forEach((file) => assert.match(read(file), /router\.js/));
+['index.html', 'channel.html', 'result.html', 'profile.html', 'space.html', 'detail.html'].forEach((file) => assert.match(read(file), /router\.js/));
+assert.match(read('page-state.js'), /scrollY/);
+assert.match(read('page-state.js'), /filters/);
+assert.match(read('page-state.js'), /category/);
+assert.match(read('page-state.js'), /selectedTab/);
 assert.match(read('channel.html'), /data-router-back/);
 ['subsidy.html', 'specials.html', 'flash-sale.html', 'summer-new.html'].forEach((file) => {
   assert.match(read(file), /data-router-back/);

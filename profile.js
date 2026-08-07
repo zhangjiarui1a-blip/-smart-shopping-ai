@@ -1,0 +1,1 @@
+(function(){document.querySelectorAll('[data-toast]').forEach(function(item){item.addEventListener('click',function(){var toast=document.createElement('div');toast.className='profile-toast';toast.textContent=item.dataset.toast;document.body.appendChild(toast);window.setTimeout(function(){toast.remove();},1800);});});}());

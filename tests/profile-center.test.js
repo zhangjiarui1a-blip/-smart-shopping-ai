@@ -1,0 +1,14 @@
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const profile = read('profile.html');
+['用户','AI 购物','我的购物','AI 中心','优惠中心','社区入口'].forEach((text) => assert(profile.includes(text), text));
+assert.match(profile, /href="index\.html"/);
+assert.match(profile, /href="mall\.html"/);
+assert.match(profile, /href="discover\.html"/);
+assert.match(profile, /class="is-active" href="profile\.html"/);
+['index.html', 'mall.html', 'discover.html'].forEach((file) => assert.match(read(file), /href="profile\.html"/));
+assert.match(profile, /product|recommend/i);
+console.log('profile center navigation tests passed');

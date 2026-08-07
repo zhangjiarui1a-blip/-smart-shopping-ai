@@ -1,0 +1,23 @@
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+
+assert(fs.existsSync(path.join(root, 'mall.html')));
+assert(fs.existsSync(path.join(root, 'discover.html')));
+assert.match(read('mall.html'), /商品大厅/);
+assert.match(read('discover.html'), /发现好物/);
+assert.match(read('index.html'), /app-bottom-nav/);
+assert.match(read('index.html'), /href="mall\.html"/);
+assert.match(read('index.html'), /href="discover\.html"/);
+assert.match(read('index.html'), /href="#profile"/);
+assert.doesNotMatch(read('index.html'), /href="channel\.html\?category/);
+const mall = read('mall.js');
+['数码科技', '潮流穿搭', '美食生活', '家居家电', '运动户外', '美妆护理', '母婴儿童', '潮玩收藏'].forEach((name) => assert.match(mall, new RegExp(name)));
+assert.match(mall, /history\.replaceState/);
+assert.match(read('mall.css'), /grid-template-columns:repeat\(3/);
+assert.match(read('mall.css'), /grid-template-columns:repeat\(2/);
+assert.match(read('discover.js'), /AI 推荐指数/);
+assert.match(read('discover.js'), /相似推荐/);
+console.log('V0.8 information architecture tests passed');
